@@ -1,0 +1,890 @@
+blueprint:
+  name: "Poolex Aqualyser - Complete pool water treatment management"
+  description: >
+    ## 🏊 Poolex Aqualyser - Complete water treatment automation
+
+    ### EN - English
+
+    Comprehensive automation blueprint for the Poolex Aqualyser Multi salt chlorinator,
+    based on manufacturer recommendations from the official manual.
+
+
+    **Features:**
+
+    - 🌡️ **Automatic chlorination time** based on water temperature
+      (manufacturer's table: temp/2 rule + detailed ranges)
+
+    - ⚡ **ORP mode recommended by default** (650-700 mV target range per manufacturer)
+
+    - 📊 **Recommended default settings:** pH setpoint 7.0-7.3, salinity 3-4 g/L,
+      polarity reversal based on water hardness
+
+    - 🚨 **Alerts & notifications:** Low salt, pH/ORP out of range, error faults,
+      water flow loss, low temperature (<10°C)
+
+    - 🔄 **Automatic boost** on high temperature (≥30°C) or manual trigger
+
+    - 💧 **External filtration pump management** (optional): if the pump is not
+      controlled via the Aqualyser's dry contact, use an external HA switch entity
+
+
+    **Manufacturer's temperature/chlorination table:**
+
+    | Water temp | Chlorination time | Filtration time |
+    |---|---|---|
+    | 10-20°C | 2h | 5-10h |
+    | 20-25°C | 4h | 10-12h |
+    | 25-28°C | 6h | 12-16h |
+    | ≥28°C | 8h | 16-24h |
+    | ≥28°C + high use | 12h | 24h |
+    | ≥30°C + high use | 24h (BOOST) | 24h |
+
+
+    **Manufacturer's production rate table:**
+
+    | Pool size | Min. output level |
+    |---|---|
+    | 15 m³ | 20% |
+    | 30 m³ | 40% |
+    | 50 m³ | 60% |
+    | 60 m³ | 80% |
+    | 80 m³ | 100% |
+
+
+    **Polarity reversal vs water hardness:**
+
+    | Water hardness (TH) | Reversal interval |
+    |---|---|
+    | TH < 30°f | 8h |
+    | TH < 40°f | 6h |
+    | TH < 50°f | 4h |
+    | TH > 50°f | 2h |
+
+
+    ---
+
+    ### FR - Français
+
+    Blueprint d'automatisation complet pour l'électrolyseur Poolex Aqualyser Multi,
+    basé sur les préconisations du constructeur (manuel officiel).
+
+
+    **Fonctionnalités :**
+
+    - 🌡️ **Temps de chloration automatique** selon la température de l'eau
+      (tableau constructeur : règle temp/2 + plages détaillées)
+
+    - ⚡ **Mode ORP recommandé par défaut** (consigne 650-700 mV selon constructeur)
+
+    - 📊 **Réglages par défaut recommandés :** consigne pH 7.0-7.3, salinité 3-4 g/L,
+      inversion de polarité selon dureté de l'eau
+
+    - 🚨 **Alertes & notifications :** Manque de sel, pH/ORP hors plage, erreurs,
+      perte de débit d'eau, température basse (<10°C)
+
+    - 🔄 **Boost automatique** en cas de température élevée (≥30°C)
+
+    - 💧 **Gestion pompe de filtration externe** (option) : si la pompe n'est pas
+      pilotée par le contact sec de l'Aqualyser, utiliser un switch HA externe
+
+
+    **Tableau température/chloration du constructeur :**
+
+    | Temp. eau | Temps chloration | Temps filtration |
+    |---|---|---|
+    | 10-20°C | 2h | 5-10h |
+    | 20-25°C | 4h | 10-12h |
+    | 25-28°C | 6h | 12-16h |
+    | ≥28°C | 8h | 16-24h |
+    | ≥28°C + fréquentation | 12h | 24h |
+    | ≥30°C + fréquentation | 24h (BOOST) | 24h |
+
+
+    **Tableau taux de production du constructeur :**
+
+    | Taille bassin | Niveau production min. |
+    |---|---|
+    | 15 m³ | 20% |
+    | 30 m³ | 40% |
+    | 50 m³ | 60% |
+    | 60 m³ | 80% |
+    | 80 m³ | 100% |
+
+
+    **Inversion de polarité vs dureté de l'eau :**
+
+    | Dureté de l'eau (TH) | Intervalle inversion |
+    |---|---|
+    | TH < 30°f | 8h |
+    | TH < 40°f | 6h |
+    | TH < 50°f | 4h |
+    | TH > 50°f | 2h |
+
+  domain: automation
+  source_url: https://github.com/make-all/tuya-local
+  input:
+    # ===== DEVICE ENTITIES =====
+    aqualyser_switch:
+      name: "Aqualyser main switch / Interrupteur principal"
+      description: >
+        EN: The main ON/OFF switch entity of your Poolex Aqualyser.
+        FR: L'entité interrupteur principal ON/OFF de votre Poolex Aqualyser.
+      selector:
+        entity:
+          domain: switch
+
+    water_temperature:
+      name: "Water temperature sensor / Capteur température eau"
+      description: >
+        EN: The water temperature sensor entity (dp 111).
+        FR: L'entité capteur de température de l'eau (dp 111).
+      selector:
+        entity:
+          domain: sensor
+          device_class: temperature
+
+    orp_sensor:
+      name: "ORP sensor / Capteur ORP"
+      description: >
+        EN: The ORP sensor entity in mV (dp 115).
+        FR: L'entité capteur ORP en mV (dp 115).
+      selector:
+        entity:
+          domain: sensor
+
+    ph_sensor:
+      name: "pH sensor / Capteur pH"
+      description: >
+        EN: The pH sensor entity (dp 117).
+        FR: L'entité capteur pH (dp 117).
+      selector:
+        entity:
+          domain: sensor
+          device_class: ph
+
+    salinity_sensor:
+      name: "Salinity sensor / Capteur salinité"
+      description: >
+        EN: The salinity sensor in g/L (dp 108). Target: 3-4 g/L.
+        FR: Le capteur de salinité en g/L (dp 108). Cible : 3-4 g/L.
+      selector:
+        entity:
+          domain: sensor
+
+    salt_dosage_sensor:
+      name: "Salt dosage sensor / Capteur sel à ajouter"
+      description: >
+        EN: The salt dosage (kg to add) sensor entity (dp 109).
+        FR: L'entité capteur de sel à ajouter en kg (dp 109).
+      selector:
+        entity:
+          domain: sensor
+
+    chlorination_time:
+      name: "Chlorination time / Temps de chloration"
+      description: >
+        EN: The chlorination time number entity in hours (dp 104, 1-24h).
+        FR: L'entité nombre temps de chloration en heures (dp 104, 1-24h).
+      selector:
+        entity:
+          domain: number
+
+    output_level:
+      name: "Output level / Niveau de production"
+      description: >
+        EN: The output level number entity in % (dp 107, 20-100% step 20).
+        FR: L'entité nombre niveau de production en % (dp 107, 20-100% pas de 20).
+      selector:
+        entity:
+          domain: number
+
+    mode_select:
+      name: "Operating mode / Mode de fonctionnement"
+      description: >
+        EN: The operating mode select entity (dp 119): ORP / Time / Flow.
+        Manufacturer recommends ORP mode.
+        FR: L'entité sélection du mode (dp 119) : ORP / Time / Flow.
+        Le constructeur recommande le mode ORP.
+      selector:
+        entity:
+          domain: select
+
+    boost_switch:
+      name: "Boost switch / Interrupteur boost"
+      description: >
+        EN: The boost mode switch entity (dp 106). Produces at 100% for 24h.
+        FR: L'entité interrupteur mode boost (dp 106). Produit à 100% pendant 24h.
+      selector:
+        entity:
+          domain: switch
+
+    orp_threshold:
+      name: "ORP threshold / Seuil ORP"
+      description: >
+        EN: The ORP threshold number entity in mV (dp 116, 400-800).
+        Manufacturer recommends 650-700 mV.
+        FR: L'entité nombre seuil ORP en mV (dp 116, 400-800).
+        Le constructeur recommande 650-700 mV.
+      selector:
+        entity:
+          domain: number
+
+    ph_threshold:
+      name: "pH threshold / Seuil pH"
+      description: >
+        EN: The pH threshold number entity (dp 118, range 6.8-7.6).
+        Manufacturer recommends 7.0-7.3.
+        FR: L'entité nombre seuil pH (dp 118, plage 6.8-7.6).
+        Le constructeur recommande 7.0-7.3.
+      selector:
+        entity:
+          domain: number
+
+    reverse_interval:
+      name: "Polarity reverse interval / Intervalle inversion polarité"
+      description: >
+        EN: The polarity reverse interval in hours (dp 105, 2/4/6/8h).
+        FR: L'entité intervalle d'inversion de polarité en heures (dp 105, 2/4/6/8h).
+      selector:
+        entity:
+          domain: number
+
+    pool_volume:
+      name: "Pool volume / Volume piscine"
+      description: >
+        EN: The pool volume number entity in m³ (dp 103, 5-200).
+        FR: L'entité nombre volume de la piscine en m³ (dp 103, 5-200).
+      selector:
+        entity:
+          domain: number
+
+    water_flow_sensor:
+      name: "Water flow sensor / Capteur débit eau"
+      description: >
+        EN: The water flow binary sensor entity (dp 127).
+        FR: L'entité capteur binaire de débit d'eau (dp 127).
+      selector:
+        entity:
+          domain: binary_sensor
+
+    fault_sensor:
+      name: "Fault sensor / Capteur erreur"
+      description: >
+        EN: The fault/error binary sensor entity (dp 123).
+        FR: L'entité capteur binaire d'erreur (dp 123).
+      selector:
+        entity:
+          domain: binary_sensor
+          device_class: problem
+
+    ph_alert_sensor:
+      name: "pH alert sensor / Capteur alerte pH"
+      description: >
+        EN: The pH alert binary sensor entity (dp 130).
+        FR: L'entité capteur binaire d'alerte pH (dp 130).
+      selector:
+        entity:
+          domain: binary_sensor
+
+    orp_alert_sensor:
+      name: "ORP alert sensor / Capteur alerte ORP"
+      description: >
+        EN: The ORP alert binary sensor entity (dp 131).
+        FR: L'entité capteur binaire d'alerte ORP (dp 131).
+      selector:
+        entity:
+          domain: binary_sensor
+
+    salt_alert_sensor:
+      name: "Salt alert sensor / Capteur alerte sel"
+      description: >
+        EN: The salt alert binary sensor entity (dp 132).
+        FR: L'entité capteur binaire d'alerte sel (dp 132).
+      selector:
+        entity:
+          domain: binary_sensor
+
+    status_sensor:
+      name: "Status sensor / Capteur état"
+      description: >
+        EN: The current status sensor entity (dp 120).
+        FR: L'entité capteur d'état actuel (dp 120).
+      selector:
+        entity:
+          domain: sensor
+
+    # ===== OPTIONAL: EXTERNAL PUMP =====
+    use_external_pump:
+      name: "Use external pump switch / Utiliser un switch pompe externe"
+      description: >
+        EN: Enable if your filtration pump is NOT connected via the Aqualyser's
+        dry contact relay, but managed by a separate HA switch entity.
+        FR: Activer si votre pompe de filtration N'EST PAS connectée via le
+        contact sec de l'Aqualyser, mais gérée par un switch HA séparé.
+      default: false
+      selector:
+        boolean: {}
+
+    external_pump_switch:
+      name: "External pump switch (optional) / Switch pompe externe (optionnel)"
+      description: >
+        EN: The HA switch entity controlling your external filtration pump.
+        Only used if 'Use external pump switch' is enabled.
+        FR: L'entité switch HA contrôlant votre pompe de filtration externe.
+        Utilisé uniquement si 'Utiliser un switch pompe externe' est activé.
+      default: {}
+      selector:
+        entity:
+          domain: switch
+
+    # ===== SETTINGS / RÉGLAGES =====
+    orp_target:
+      name: "ORP target value (mV) / Consigne ORP (mV)"
+      description: >
+        EN: Target ORP value in mV. Manufacturer recommends 650-700 mV.
+        WHO: minimum 650 mV for disinfected water.
+        Do not exceed 750 mV (skin/respiratory irritation risk).
+        FR: Consigne ORP en mV. Le constructeur recommande 650-700 mV.
+        OMS : minimum 650 mV pour une eau désinfectée.
+        Ne pas dépasser 750 mV (risque d'irritation peau/voies respiratoires).
+      default: 680
+      selector:
+        number:
+          min: 400
+          max: 800
+          step: 10
+          unit_of_measurement: mV
+          mode: slider
+
+    ph_target:
+      name: "pH target value / Consigne pH"
+      description: >
+        EN: Target pH value. Manufacturer recommends 7.0 to 7.3.
+        WARNING: pH above 7.8 destroys hypochlorite disinfecting power.
+        FR: Consigne pH. Le constructeur recommande 7.0 à 7.3.
+        ATTENTION : un pH supérieur à 7.8 annihile le pouvoir désinfectant.
+      default: 7.2
+      selector:
+        number:
+          min: 6.8
+          max: 7.6
+          step: 0.1
+          mode: slider
+
+    reverse_hours:
+      name: "Polarity reverse time (h) / Temps inversion polarité (h)"
+      description: >
+        EN: Polarity reversal interval in hours. Based on water hardness (TH):
+        TH < 30°f → 8h | TH < 40°f → 6h | TH < 50°f → 4h | TH > 50°f → 2h
+        FR: Intervalle d'inversion de polarité en heures. Selon dureté (TH) :
+        TH < 30°f → 8h | TH < 40°f → 6h | TH < 50°f → 4h | TH > 50°f → 2h
+      default: 6
+      selector:
+        number:
+          min: 2
+          max: 8
+          step: 2
+          unit_of_measurement: h
+
+    enable_auto_chlorination_time:
+      name: "Auto chlorination time / Temps chloration auto"
+      description: >
+        EN: Automatically adjust chlorination time based on water temperature
+        using manufacturer's table.
+        FR: Ajuster automatiquement le temps de chloration selon la température
+        de l'eau en utilisant le tableau du constructeur.
+      default: true
+      selector:
+        boolean: {}
+
+    enable_auto_output_level:
+      name: "Auto output level / Niveau production auto"
+      description: >
+        EN: Automatically set output level based on pool volume using
+        manufacturer's table on startup/daily check.
+        FR: Régler automatiquement le niveau de production selon le volume
+        de la piscine en utilisant le tableau du constructeur au démarrage.
+      default: true
+      selector:
+        boolean: {}
+
+    enable_auto_boost:
+      name: "Auto boost on high temp / Boost auto haute température"
+      description: >
+        EN: Automatically enable boost when water temp ≥ 30°C
+        (manufacturer's recommendation for extreme heat).
+        FR: Activer automatiquement le boost quand temp eau ≥ 30°C
+        (recommandation du constructeur en cas de forte chaleur).
+      default: true
+      selector:
+        boolean: {}
+
+    enable_notifications:
+      name: "Enable notifications / Activer les notifications"
+      description: >
+        EN: Send notifications on alerts (low salt, pH/ORP out of range,
+        faults, water flow loss, low temperature).
+        FR: Envoyer des notifications sur les alertes (manque de sel,
+        pH/ORP hors plage, erreurs, perte de débit, température basse).
+      default: true
+      selector:
+        boolean: {}
+
+    notification_service:
+      name: "Notification service / Service de notification"
+      description: >
+        EN: Notification service (e.g. notify.mobile_app_your_phone).
+        Default: persistent_notification for HA dashboard.
+        FR: Service de notification (ex: notify.mobile_app_votre_tel).
+        Par défaut : persistent_notification pour le tableau de bord HA.
+      default: persistent_notification.create
+      selector:
+        text: {}
+
+    enable_pump_management:
+      name: "Auto filtration pump / Gestion auto pompe filtration"
+      description: >
+        EN: Automatically turn on/off external filtration pump when
+        Aqualyser starts/stops. Only with external pump switch.
+        FR: Allumer/éteindre automatiquement la pompe de filtration
+        externe quand l'Aqualyser démarre/s'arrête. Avec switch pompe externe uniquement.
+      default: false
+      selector:
+        boolean: {}
+
+    daily_check_time:
+      name: "Daily check time / Heure vérification quotidienne"
+      description: >
+        EN: Time of day to run daily parameter check and adjustments.
+        FR: Heure pour la vérification quotidienne des paramètres.
+      default: "10:00:00"
+      selector:
+        time: {}
+
+variables:
+  use_ext_pump: !input use_external_pump
+  ext_pump: !input external_pump_switch
+  auto_chlor: !input enable_auto_chlorination_time
+  auto_output: !input enable_auto_output_level
+  auto_boost: !input enable_auto_boost
+  notif_enabled: !input enable_notifications
+  notif_service: !input notification_service
+  pump_mgmt: !input enable_pump_management
+  orp_target_val: !input orp_target
+  ph_target_val: !input ph_target
+  reverse_h: !input reverse_hours
+  water_temp_entity: !input water_temperature
+  salinity_entity: !input salinity_sensor
+  salt_dosage_entity: !input salt_dosage_sensor
+  orp_sensor_entity: !input orp_sensor
+  ph_sensor_entity: !input ph_sensor
+  pool_vol_entity: !input pool_volume
+  status_entity: !input status_sensor
+
+trigger:
+  # ---- Daily scheduled check ----
+  - platform: time
+    at: !input daily_check_time
+    id: daily_check
+
+  # ---- Temperature thresholds ----
+  - platform: numeric_state
+    entity_id: !input water_temperature
+    above: 28
+    id: temp_high
+
+  - platform: numeric_state
+    entity_id: !input water_temperature
+    above: 30
+    id: temp_very_high
+
+  - platform: numeric_state
+    entity_id: !input water_temperature
+    below: 10
+    id: temp_too_low
+
+  # ---- Alert triggers ----
+  - platform: state
+    entity_id: !input salt_alert_sensor
+    to: "on"
+    id: salt_alert
+
+  - platform: state
+    entity_id: !input ph_alert_sensor
+    to: "on"
+    id: ph_alert
+
+  - platform: state
+    entity_id: !input orp_alert_sensor
+    to: "on"
+    id: orp_alert
+
+  - platform: state
+    entity_id: !input fault_sensor
+    to: "on"
+    id: fault_alert
+
+  - platform: state
+    entity_id: !input water_flow_sensor
+    to: "off"
+    for:
+      minutes: 5
+    id: flow_lost
+
+  # ---- Aqualyser turned on → start pump ----
+  - platform: state
+    entity_id: !input aqualyser_switch
+    to: "on"
+    id: aqualyser_on
+
+  # ---- Aqualyser turned off → stop pump ----
+  - platform: state
+    entity_id: !input aqualyser_switch
+    to: "off"
+    id: aqualyser_off
+
+  # ---- HA Startup ----
+  - platform: homeassistant
+    event: start
+    id: ha_start
+
+action:
+  - choose:
+      # ========================================
+      # DAILY CHECK & AUTO-ADJUSTMENT
+      # ========================================
+      - conditions:
+          - condition: trigger
+            id:
+              - daily_check
+              - ha_start
+        sequence:
+          # -- Apply recommended ORP target --
+          - action: number.set_value
+            target:
+              entity_id: !input orp_threshold
+            data:
+              value: "{{ orp_target_val }}"
+
+          # -- Apply recommended pH target --
+          - action: number.set_value
+            target:
+              entity_id: !input ph_threshold
+            data:
+              value: "{{ ph_target_val }}"
+
+          # -- Apply polarity reversal interval --
+          - action: number.set_value
+            target:
+              entity_id: !input reverse_interval
+            data:
+              value: "{{ reverse_h }}"
+
+          # -- Set mode to ORP (manufacturer's recommended mode) --
+          - action: select.select_option
+            target:
+              entity_id: !input mode_select
+            data:
+              option: "ORP"
+
+          # -- Auto-adjust chlorination time based on water temperature --
+          # Manufacturer's table:
+          #   <10°C: system inoperable | 10-20°C: 2h | 20-25°C: 4h
+          #   25-28°C: 6h | ≥28°C: 8h | ≥30°C: 12h+
+          - if:
+              - condition: template
+                value_template: "{{ auto_chlor }}"
+            then:
+              - action: number.set_value
+                target:
+                  entity_id: !input chlorination_time
+                data:
+                  value: >-
+                    {% set wt = states(water_temp_entity) | float(20) %}
+                    {% if wt < 10 %}1
+                    {% elif wt < 20 %}2
+                    {% elif wt < 25 %}4
+                    {% elif wt < 28 %}6
+                    {% elif wt < 30 %}8
+                    {% else %}12
+                    {% endif %}
+
+          # -- Auto-adjust output level based on pool volume --
+          # Manufacturer's table:
+          #   ≤15m³: 20% | ≤30m³: 40% | ≤50m³: 60% | ≤60m³: 80% | >60m³: 100%
+          - if:
+              - condition: template
+                value_template: "{{ auto_output }}"
+            then:
+              - action: number.set_value
+                target:
+                  entity_id: !input output_level
+                data:
+                  value: >-
+                    {% set vol = states(pool_vol_entity) | float(30) %}
+                    {% if vol <= 15 %}20
+                    {% elif vol <= 30 %}40
+                    {% elif vol <= 50 %}60
+                    {% elif vol <= 60 %}80
+                    {% else %}100
+                    {% endif %}
+
+          # -- Start external pump if managed --
+          - if:
+              - condition: template
+                value_template: >-
+                  {{ pump_mgmt and use_ext_pump
+                     and ext_pump is defined and ext_pump | length > 0
+                     and is_state(water_temp_entity, 'on') or true }}
+            then:
+              - if:
+                  - condition: state
+                    entity_id: !input aqualyser_switch
+                    state: "on"
+                then:
+                  - action: switch.turn_on
+                    target:
+                      entity_id: !input external_pump_switch
+
+      # ========================================
+      # HIGH TEMPERATURE (≥28°C)
+      # ========================================
+      - conditions:
+          - condition: trigger
+            id: temp_high
+        sequence:
+          - if:
+              - condition: template
+                value_template: "{{ auto_chlor }}"
+            then:
+              - action: number.set_value
+                target:
+                  entity_id: !input chlorination_time
+                data:
+                  value: 8
+          - if:
+              - condition: template
+                value_template: "{{ notif_enabled }}"
+            then:
+              - action: "{{ notif_service }}"
+                data:
+                  title: "🏊 Aqualyser - High temperature / Température élevée"
+                  message: >-
+                    EN: Water temperature above 28°C (current: {{ states(water_temp_entity) }}°C).
+                    Chlorination time set to 8h. Filtration recommended: 16-24h.
+
+                    FR: Température eau supérieure à 28°C (actuelle : {{ states(water_temp_entity) }}°C).
+                    Temps de chloration réglé à 8h. Filtration recommandée : 16-24h.
+
+      # ========================================
+      # VERY HIGH TEMPERATURE (≥30°C) → AUTO BOOST
+      # ========================================
+      - conditions:
+          - condition: trigger
+            id: temp_very_high
+        sequence:
+          - if:
+              - condition: template
+                value_template: "{{ auto_boost }}"
+            then:
+              - action: switch.turn_on
+                target:
+                  entity_id: !input boost_switch
+              - action: number.set_value
+                target:
+                  entity_id: !input chlorination_time
+                data:
+                  value: 24
+          - if:
+              - condition: template
+                value_template: "{{ notif_enabled }}"
+            then:
+              - action: "{{ notif_service }}"
+                data:
+                  title: "🔥 Aqualyser - Extreme heat / Chaleur extrême"
+                  message: >-
+                    EN: Water temp above 30°C ({{ states(water_temp_entity) }}°C)!
+                    BOOST mode activated (100% production for 24h).
+                    Filtration should run 24h.
+                    If temp stays above 32°C, consider adding chlorine tablets
+                    in a floating dispenser (NOT in the skimmer).
+
+                    FR: Temp eau supérieure à 30°C ({{ states(water_temp_entity) }}°C) !
+                    Mode BOOST activé (production 100% pendant 24h).
+                    La filtration doit tourner 24h.
+                    Si la température reste au-dessus de 32°C, envisagez d'ajouter
+                    du chlore en galet dans un diffuseur flottant (PAS dans le skimmer).
+
+      # ========================================
+      # TOO LOW TEMPERATURE (<10°C)
+      # ========================================
+      - conditions:
+          - condition: trigger
+            id: temp_too_low
+        sequence:
+          - if:
+              - condition: template
+                value_template: "{{ notif_enabled }}"
+            then:
+              - action: "{{ notif_service }}"
+                data:
+                  title: "❄️ Aqualyser - Low temperature / Température basse"
+                  message: >-
+                    EN: Water temperature below 10°C ({{ states(water_temp_entity) }}°C)!
+                    Electrolysis system inoperable below 10°C (error E2).
+                    Consider winterizing your system.
+
+                    FR: Température eau inférieure à 10°C ({{ states(water_temp_entity) }}°C) !
+                    Système d'électrolyse inopérant en dessous de 10°C (erreur E2).
+                    Envisagez l'hivernage de votre système.
+
+      # ========================================
+      # SALT ALERT
+      # ========================================
+      - conditions:
+          - condition: trigger
+            id: salt_alert
+        sequence:
+          - if:
+              - condition: template
+                value_template: "{{ notif_enabled }}"
+            then:
+              - action: "{{ notif_service }}"
+                data:
+                  title: "🧂 Aqualyser - Low salt / Manque de sel"
+                  message: >-
+                    EN: Low salt detected! Salinity: {{ states(salinity_entity) }} g/L
+                    (target: 3-4 g/L). Salt to add: {{ states(salt_dosage_entity) }} kg.
+                    Error E5 may appear.
+
+                    FR: Manque de sel détecté ! Salinité : {{ states(salinity_entity) }} g/L
+                    (cible : 3-4 g/L). Sel à ajouter : {{ states(salt_dosage_entity) }} kg.
+                    L'erreur E5 peut apparaître.
+
+      # ========================================
+      # pH ALERT
+      # ========================================
+      - conditions:
+          - condition: trigger
+            id: ph_alert
+        sequence:
+          - if:
+              - condition: template
+                value_template: "{{ notif_enabled }}"
+            then:
+              - action: "{{ notif_service }}"
+                data:
+                  title: "⚗️ Aqualyser - pH alert / Alerte pH"
+                  message: >-
+                    EN: pH out of range! Current: {{ states(ph_sensor_entity) }}
+                    (target: 7.0-7.4). pH > 7.8 destroys disinfecting power.
+                    Check pH- liquid level. If pH probe faulty, disable dosing pump.
+
+                    FR: pH hors plage ! Actuel : {{ states(ph_sensor_entity) }}
+                    (cible : 7.0-7.4). Un pH > 7.8 annihile le pouvoir désinfectant.
+                    Vérifiez le niveau de pH-. Si la sonde pH est défaillante,
+                    désactivez la pompe doseuse.
+
+      # ========================================
+      # ORP ALERT
+      # ========================================
+      - conditions:
+          - condition: trigger
+            id: orp_alert
+        sequence:
+          - if:
+              - condition: template
+                value_template: "{{ notif_enabled }}"
+            then:
+              - action: "{{ notif_service }}"
+                data:
+                  title: "📊 Aqualyser - ORP alert / Alerte ORP"
+                  message: >-
+                    EN: ORP out of range! Current: {{ states(orp_sensor_entity) }} mV
+                    (target: 650-750 mV, WHO min: 650 mV).
+                    Too high (>750): skin irritation risk.
+                    Too low (<650): bacteria/algae risk (green water).
+                    Check salinity, pH, and probe calibration.
+
+                    FR: ORP hors plage ! Actuel : {{ states(orp_sensor_entity) }} mV
+                    (cible : 650-750 mV, OMS min : 650 mV).
+                    Trop élevé (>750) : risque d'irritation cutanée.
+                    Trop bas (<650) : risque bactéries/algues (eau verte).
+                    Vérifiez la salinité, le pH et l'étalonnage de la sonde.
+
+      # ========================================
+      # FAULT / ERROR
+      # ========================================
+      - conditions:
+          - condition: trigger
+            id: fault_alert
+        sequence:
+          - if:
+              - condition: template
+                value_template: "{{ notif_enabled }}"
+            then:
+              - action: "{{ notif_service }}"
+                data:
+                  title: "🚨 Aqualyser - Fault / Erreur"
+                  message: >-
+                    EN: Fault detected! Check fault code in diagnostics.
+                    Common: E1=temp sensor, E2=water<10°C, E3=flow,
+                    E4=salinity, E5=low salt. See manual chapter 6.
+
+                    FR: Erreur détectée ! Vérifiez le code erreur dans les diagnostics.
+                    Courantes : E1=sonde temp, E2=eau<10°C, E3=débit,
+                    E4=salinité, E5=manque de sel. Voir manuel chapitre 6.
+
+      # ========================================
+      # WATER FLOW LOST
+      # ========================================
+      - conditions:
+          - condition: trigger
+            id: flow_lost
+        sequence:
+          - if:
+              - condition: template
+                value_template: "{{ notif_enabled }}"
+            then:
+              - action: "{{ notif_service }}"
+                data:
+                  title: "💧 Aqualyser - No water flow / Pas de débit"
+                  message: >-
+                    EN: No water flow for 5 min! Electrolyser cannot operate.
+                    Check: pump running, valves open, filter clean.
+
+                    FR: Pas de débit depuis 5 min ! L'électrolyseur ne peut fonctionner.
+                    Vérifiez : pompe en marche, vannes ouvertes, filtre propre.
+
+      # ========================================
+      # AQUALYSER ON → START EXTERNAL PUMP
+      # ========================================
+      - conditions:
+          - condition: trigger
+            id: aqualyser_on
+          - condition: template
+            value_template: >-
+              {{ pump_mgmt and use_ext_pump
+                 and ext_pump is defined and ext_pump | length > 0 }}
+        sequence:
+          - action: switch.turn_on
+            target:
+              entity_id: !input external_pump_switch
+
+      # ========================================
+      # AQUALYSER OFF → STOP EXTERNAL PUMP
+      # ========================================
+      - conditions:
+          - condition: trigger
+            id: aqualyser_off
+          - condition: template
+            value_template: >-
+              {{ pump_mgmt and use_ext_pump
+                 and ext_pump is defined and ext_pump | length > 0 }}
+        sequence:
+          - action: switch.turn_off
+            target:
+              entity_id: !input external_pump_switch
+
+mode: single
+max_exceeded: silent
