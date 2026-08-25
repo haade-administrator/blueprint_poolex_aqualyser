@@ -3,27 +3,24 @@ blueprint:
   description: >
     ## 🏊 Poolex Aqualyser - Smart Filtration & Chlorination / Gestion Smart Filtration & Chloration
 
-    ### 🇬🇧 English - Manufacturer Recommendation Table
-    | Water Temperature | Treatment Duration | Filtration Duration |
-    | :--- | :--- | :--- |
-    | **10°C ≤ T° < 20°C** *(or covered pool)* | 2h | 6h |
-    | **20°C ≤ T° < 25°C** | 4h | 10h |
-    | **25°C ≤ T° < 28°C** | 6h | 14h |
-    | **T° ≥ 28°C** | 8h | 18h |
-    | **T° ≥ 28°C** *(High attendance)* | 12h | 24h |
-    | **T° ≥ 30°C** *(High attendance)* | 24h *(BOOST)* | 24h |
+    ### 🇬🇧 English - Manufacturer Recommendations
+    - **10°C ≤ T° < 20°C (or covered pool):** Treatment = 2h | Filtration = 6h
+    - **20°C ≤ T° < 25°C:** Treatment = 4h | Filtration = 10h
+    - **25°C ≤ T° < 28°C:** Treatment = 6h | Filtration = 14h
+    - **T° ≥ 28°C:** Treatment = 8h | Filtration = 18h
+    - **T° ≥ 28°C (High attendance):** Treatment = 12h | Filtration = 24h
+    - **T° ≥ 30°C (High attendance):** Treatment = 24h (BOOST) | Filtration = 24h
 
     ---
 
-    ### 🇫🇷 Français - Tableau des préconisations du fabricant
-    | Température de l'eau | Temps de traitement | Temps de filtration |
-    | :--- | :--- | :--- |
-    | **10°C ≤ T° < 20°C** *(ou piscine couverte)* | 2h | 6h |
-    | **20°C ≤ T° < 25°C** | 4h | 10h |
-    | **25°C ≤ T° < 28°C** | 6h | 14h |
-    | **T° ≥ 28°C** | 8h | 18h |
-    | **T° ≥ 28°C** *(Forte fréquentation)* | 12h | 24h |
-    | **T° ≥ 30°C** *(Forte fréquentation)* | 24h *(BOOST)* | 24h |
+    ### 🇫🇷 Français - Préconisations du Fabricant
+    - **10°C ≤ T° < 20°C (ou piscine couverte) :** Traitement = 2h | Filtration = 6h
+    - **20°C ≤ T° < 25°C :** Traitement = 4h | Filtration = 10h
+    - **25°C ≤ T° < 28°C :** Traitement = 6h | Filtration = 14h
+    - **T° ≥ 28°C :** Traitement = 8h | Filtration = 18h
+    - **T° ≥ 28°C (Forte fréquentation) :** Traitement = 12h | Filtration = 24h
+    - **T° ≥ 30°C (Forte fréquentation) :** Traitement = 24h (BOOST) | Filtration = 24h
+
 
 
   domain: automation
