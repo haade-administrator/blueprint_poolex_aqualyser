@@ -40,9 +40,3 @@ Adjustment table for filtration duration and chlorination (treatment) time based
 | **T° ≥ 28°C** *(High attendance)* | 12h | 24h |
 | **T° ≥ 30°C** *(High attendance)* | 24h *(BOOST)* | 24h |
 
----
-
-## 🛠️ Fichiers inclus / Included Files
-
-- `custom_components/tuya_local/devices/poolex_aqualyser.yaml` : Configuration du périphérique pour Tuya-Local.
-- `custom_components/poolex_files/poolex_aqualyser_blueprint.yaml` : Blueprint d'automatisation Home Assistant.
