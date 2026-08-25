@@ -12,7 +12,7 @@ blueprint:
 
     - **25°C ≤ T° < 28°C:** Treatment = 6h | Filtration = 14h
 
-    - **T° ≥ 28°C:** Treatment = 8h | Filtration = 18h
+    - **T° ≥ 28°C (Normal attendance / default):** Treatment = 8h | Filtration = 18h
 
     - **T° ≥ 28°C (High attendance):** Treatment = 12h | Filtration = 24h
 
@@ -30,7 +30,7 @@ blueprint:
 
     - **25°C ≤ T° < 28°C :** Traitement = 6h | Filtration = 14h
 
-    - **T° ≥ 28°C :** Traitement = 8h | Filtration = 18h
+    - **T° ≥ 28°C (Fréquentation normale / par défaut) :** Traitement = 8h | Filtration = 18h
 
     - **T° ≥ 28°C (Forte fréquentation) :** Traitement = 12h | Filtration = 24h
 
@@ -68,12 +68,15 @@ blueprint:
         entity:
           domain: switch
 
-    high_attendance_mode:
-      name: "High Attendance Mode / Mode Forte Fréquentation"
-      description: "Enable if the pool has heavy usage/attendance."
-      default: false
+    high_attendance_switch:
+      name: "High Attendance Switch Entity (Optional) / Switch Fréquentation (Optionnel)"
+      description: "Optional input_boolean or switch. If ON = High Attendance. If OFF or NOT set = Normal Attendance by default."
+      default: {}
       selector:
-        boolean: {}
+        entity:
+          domain:
+            - input_boolean
+            - switch
 
     daily_start_time:
       name: "Daily Filtration Start Time / Heure de Début de Filtration"
@@ -87,7 +90,7 @@ variables:
   chlor_time_entity: !input chlorination_time_number
   boost_entity: !input boost_switch
   pump_entity: !input filtration_pump_switch
-  high_use: !input high_attendance_mode
+  attendance_entity: !input high_attendance_switch
 
 trigger:
   - platform: time
@@ -167,8 +170,9 @@ action:
         sequence:
           - if:
               - condition: template
-                value_template: "{{ high_use }}"
+                value_template: "{{ attendance_entity != {} and is_state(attendance_entity, 'on') }}"
             then:
+              # Forte fréquentation (uniquement si le switch est sélectionné ET actif)
               - action: number.set_value
                 target:
                   entity_id: !input chlorination_time_number
@@ -183,6 +187,7 @@ action:
                 target:
                   entity_id: !input filtration_pump_switch
             else:
+              # Fréquentation normale (par défaut si non renseigné ou si le switch est OFF)
               - action: number.set_value
                 target:
                   entity_id: !input chlorination_time_number
@@ -203,8 +208,9 @@ action:
         sequence:
           - if:
               - condition: template
-                value_template: "{{ high_use }}"
+                value_template: "{{ attendance_entity != {} and is_state(attendance_entity, 'on') }}"
             then:
+              # Forte fréquentation (uniquement si le switch est sélectionné ET actif)
               - action: switch.turn_on
                 target:
                   entity_id: !input boost_switch
@@ -217,6 +223,7 @@ action:
                 target:
                   entity_id: !input filtration_pump_switch
             else:
+              # Fréquentation normale (par défaut si non renseigné ou si le switch est OFF)
               - action: number.set_value
                 target:
                   entity_id: !input chlorination_time_number
