@@ -8,7 +8,7 @@ Ce dépôt contient la configuration du périphérique **Poolex Aqualyser Multi*
 
 Cliquez sur le bouton ci-dessous pour importer directement le blueprint d'automatisation dans votre instance Home Assistant :
 
-[![my_homeassistant_import](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=[https%3A%2F%2Fgithub.com%2Fmake-all%2Ftuya-local%2Fblob%2Fmain%2Fcustom_components%2Fpoolex_files%2Fpoolex_aqualyser_blueprint.yaml](https://github.com/haade-administrator/blueprint_poolex_aqualyser/blob/main/poolex_aqualyser_blueprint.yaml))
+[![my_homeassistant_import](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fhaade-administrator%2Fblueprint_poolex_aqualyser%2Fblob%2Fmain%2Fpoolex_aqualyser_blueprint.yaml)
 
 ---
 
