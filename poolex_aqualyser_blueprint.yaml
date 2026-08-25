@@ -65,7 +65,7 @@ blueprint:
   input:
     water_temperature_sensor:
       name: "Water Temperature Sensor / Capteur Température Eau"
-      description: "Sensor providing current pool water temperature (dp 111)."
+      description: "Sensor providing current pool water temperature (dp 111). Triggers the automation when changed."
       selector:
         entity:
           domain: sensor
@@ -102,13 +102,6 @@ blueprint:
             - input_boolean
             - switch
 
-    daily_start_time:
-      name: "Daily Filtration Start Time / Heure de Début de Filtration"
-      description: "Time of day when the filtration cycle starts."
-      default: "09:00:00"
-      selector:
-        time: {}
-
 variables:
   temp_sensor: !input water_temperature_sensor
   chlor_time_entity: !input chlorination_time_number
@@ -117,9 +110,9 @@ variables:
   attendance_entity: !input high_attendance_switch
 
 trigger:
-  - platform: time
-    at: !input daily_start_time
-    id: daily_start
+  - platform: state
+    entity_id: !input water_temperature_sensor
+    id: temp_changed
 
 action:
   - choose:
@@ -262,5 +255,5 @@ action:
                 target:
                   entity_id: !input filtration_pump_switch
 
-mode: single
+mode: restart
 max_exceeded: silent
