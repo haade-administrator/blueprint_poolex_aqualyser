@@ -12,14 +12,6 @@ Cliquez sur le bouton ci-dessous pour importer directement le blueprint d'automa
 
 ---
 
-## ⚙️ Fonctionnement du Switch Fréquentation (Optionnel) / High Attendance Switch (Optional)
-
-L'option **Switch Fréquentation / High Attendance Switch** est optionnelle :
-- **Non renseigné ou positionné sur `OFF` (Par défaut)** : L'automatisation applique la fréquentation normale (ex: 8h chloration / 18h filtration à ≥28°C).
-- **Positionné sur `ON`** : L'automatisation bascule en mode forte fréquentation (ex: 12h chloration / 24h filtration à ≥28°C, et Mode BOOST 24h à ≥30°C).
-
----
-
 ## 📊 Préconisations du Fabricant / Manufacturer Recommendations
 
 ### 🇫🇷 Français
@@ -47,6 +39,28 @@ Adjustment table for filtration duration and chlorination (treatment) time based
 | **T° ≥ 28°C** *(Normal attendance / default)* | 8h | 18h |
 | **T° ≥ 28°C** *(High attendance)* | 12h | 24h |
 | **T° ≥ 30°C** *(High attendance)* | 24h *(BOOST)* | 24h |
+
+---
+
+## ⚙️ Fonctionnement du Switch Fréquentation (Optionnel) / High Attendance Switch (Optional)
+
+### 🇫🇷 Français
+L'option **Switch Fréquentation / High Attendance Switch** est optionnelle :
+- **Non renseigné ou positionné sur `OFF` (Par défaut)** : L'automatisation applique la fréquentation normale (ex: 8h chloration / 18h filtration à ≥28°C).
+- **Positionné sur `ON`** : L'automatisation bascule en mode forte fréquentation (ex: 12h chloration / 24h filtration à ≥28°C, et Mode BOOST 24h à ≥30°C).
+
+#### Comment créer l'entité dans Home Assistant (si ce n'est pas déjà fait) :
+Dans Home Assistant : **Paramètres** → **Appareils et services** → **Entrées (Helpers)** → **Créer une entrée** → **Interrupteur (Input boolean)** et nommez-le par exemple `Forte Fréquentation Piscine`. Vous n'avez plus qu'à le sélectionner lors de la configuration du Blueprint !
+
+---
+
+### 🇬🇧 English
+The **High Attendance Switch** option is optional:
+- **Not set or set to `OFF` (Default)**: Automation applies normal attendance (e.g. 8h chlorination / 18h filtration at ≥28°C).
+- **Set to `ON`**: Automation switches to high attendance mode (e.g. 12h chlorination / 24h filtration at ≥28°C, and 24h BOOST Mode at ≥30°C).
+
+#### How to create the entity in Home Assistant (if not already done):
+In Home Assistant: **Settings** → **Devices & Services** → **Helpers** → **Create Helper** → **Toggle (Input boolean)** and name it e.g. `Pool High Attendance`. Then simply select it when configuring the Blueprint!
 
 ---
 
