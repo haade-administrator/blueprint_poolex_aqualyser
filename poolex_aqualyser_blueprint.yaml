@@ -23,9 +23,9 @@ blueprint:
 
     The **High Attendance Switch** option is optional:
 
-    - **Not set or set to `OFF` (Default):** Automation applies normal attendance (e.g. 8h chlorination / 18h filtration at ≥28°C).
+    - **Not set or set to `OFF` (Default):** Automation applies normal attendance.
 
-    - **Set to `ON`:** Automation switches to high attendance mode (e.g. 12h chlorination / 24h filtration at ≥28°C, and 24h BOOST Mode at ≥30°C).
+    - **Set to `ON`:** Automation switches to high attendance mode.
 
 
     **How to create the entity in Home Assistant:** Settings → Devices & Services → Helpers → Create Helper → Toggle (Input boolean) and name it e.g. "Pool High Attendance".
@@ -51,21 +51,25 @@ blueprint:
 
     ### ⚙️ Fonctionnement du Switch Fréquentation (Optionnel)
 
-    L'option **Switch Fréquentation / High Attendance Switch** est optionnelle :
+    L'option **Switch Fréquentation** est optionnelle :
 
-    - **Non renseigné ou positionné sur `OFF` (Par défaut) :** L'automatisation applique la fréquentation normale (ex: 8h chloration / 18h filtration à ≥28°C).
+    - **Non renseigné ou `OFF` (Par défaut) :** Fréquentation normale.
 
-    - **Positionné sur `ON` :** L'automatisation bascule en mode forte fréquentation (ex: 12h chloration / 24h filtration à ≥28°C, et Mode BOOST 24h à ≥30°C).
+    - **`ON` :** Mode forte fréquentation.
 
 
-    **Comment créer l'entité dans Home Assistant :** Paramètres → Appareils et services → Entrées (Helpers) → Créer une entrée → Interrupteur (Input boolean) et nommez-le par exemple "Forte Fréquentation Piscine".
+    **Comment créer l'entité :** Paramètres → Appareils et services → Entrées (Helpers) → Créer une entrée → Interrupteur (Input boolean) et nommez-le "Forte Fréquentation Piscine".
 
   domain: automation
   source_url: https://github.com/haade-administrator/blueprint_poolex_aqualyser/blob/main/poolex_aqualyser_blueprint.yaml
   input:
     water_temperature_sensor:
       name: "Water Temperature Sensor / Capteur Température Eau"
-      description: "Sensor providing current pool water temperature (dp 111). Triggers the automation when changed."
+      description: >
+        EN: Water temperature sensor entity. The automation triggers when
+        the temperature crosses a threshold boundary (10, 20, 25, 28, 30°C).
+        FR: Capteur de température de l'eau. L'automatisation se déclenche
+        quand la température franchit un seuil (10, 20, 25, 28, 30°C).
       selector:
         entity:
           domain: sensor
@@ -73,29 +77,39 @@ blueprint:
 
     chlorination_time_number:
       name: "Chlorination Time Number / Temps de Chloration"
-      description: "Number entity to set chlorination duration in hours (dp 104)."
+      description: >
+        EN: Number entity to set chlorination duration in hours (dp 104).
+        FR: Entité nombre pour définir le temps de chloration en heures (dp 104).
       selector:
         entity:
           domain: number
 
     boost_switch:
       name: "Boost Switch / Interrupteur Boost"
-      description: "Switch entity to activate 24h Boost mode (dp 106)."
+      description: >
+        EN: Switch entity to activate 24h Boost mode (dp 106).
+        FR: Interrupteur pour activer le mode Boost 24h (dp 106).
       selector:
         entity:
           domain: switch
 
     filtration_pump_switch:
       name: "Filtration Pump Switch / Switch Pompe de Filtration"
-      description: "Switch entity controlling the filtration pump (external switch or dry contact)."
+      description: >
+        EN: Switch entity controlling the filtration pump (external or dry contact).
+        FR: Interrupteur contrôlant la pompe de filtration (externe ou contact sec).
       selector:
         entity:
           domain: switch
 
     high_attendance_switch:
-      name: "High Attendance Switch Entity (Optional) / Switch Fréquentation (Optionnel)"
-      description: "Optional input_boolean or switch. If ON = High Attendance. If OFF or NOT set = Normal Attendance by default."
-      default: {}
+      name: "High Attendance Switch (Optional) / Switch Fréquentation (Optionnel)"
+      description: >
+        EN: Optional input_boolean or switch. ON = High Attendance.
+        OFF or not set = Normal Attendance (default).
+        FR: Optionnel. ON = Forte Fréquentation.
+        OFF ou non renseigné = Fréquentation Normale (par défaut).
+      default: ""
       selector:
         entity:
           domain:
@@ -104,156 +118,125 @@ blueprint:
 
 variables:
   temp_sensor: !input water_temperature_sensor
-  chlor_time_entity: !input chlorination_time_number
-  boost_entity: !input boost_switch
-  pump_entity: !input filtration_pump_switch
   attendance_entity: !input high_attendance_switch
+  high_use: >-
+    {{ attendance_entity | length > 0 and is_state(attendance_entity, 'on') }}
 
 trigger:
-  - platform: state
+  # Fires when temperature crosses INTO each range
+  - platform: numeric_state
     entity_id: !input water_temperature_sensor
-    id: temp_changed
+    below: 10
+    id: below_10
+
+  - platform: numeric_state
+    entity_id: !input water_temperature_sensor
+    above: 10
+    below: 20
+    id: range_10_20
+
+  - platform: numeric_state
+    entity_id: !input water_temperature_sensor
+    above: 20
+    below: 25
+    id: range_20_25
+
+  - platform: numeric_state
+    entity_id: !input water_temperature_sensor
+    above: 25
+    below: 28
+    id: range_25_28
+
+  - platform: numeric_state
+    entity_id: !input water_temperature_sensor
+    above: 28
+    below: 30
+    id: range_28_30
+
+  - platform: numeric_state
+    entity_id: !input water_temperature_sensor
+    above: 30
+    id: above_30
+
+  # Also evaluate on HA startup
+  - platform: homeassistant
+    event: start
+    id: ha_start
+
+  # Re-evaluate when attendance switch changes
+  - platform: state
+    entity_id: !input high_attendance_switch
+    id: attendance_changed
+
+condition:
+  # Ignore unavailable/unknown temperature states
+  - condition: template
+    value_template: >-
+      {{ states(temp_sensor) not in ['unavailable', 'unknown', ''] }}
 
 action:
-  - choose:
-      - conditions:
-          - condition: template
-            value_template: "{{ states(temp_sensor) | float(20) < 10 }}"
-        sequence:
-          # Under 10°C, system is inoperable per manual
-          - action: number.set_value
-            target:
-              entity_id: !input chlorination_time_number
-            data:
-              value: 1
+  - variables:
+      wt: "{{ states(temp_sensor) | float(20) }}"
+      treatment_hours: >-
+        {% if wt < 10 %}1
+        {% elif wt < 20 %}2
+        {% elif wt < 25 %}4
+        {% elif wt < 28 %}6
+        {% elif wt >= 30 and high_use %}24
+        {% elif wt >= 28 and high_use %}12
+        {% elif wt >= 28 %}8
+        {% else %}2
+        {% endif %}
+      filtration_hours: >-
+        {% if wt < 10 %}0
+        {% elif wt < 20 %}6
+        {% elif wt < 25 %}10
+        {% elif wt < 28 %}14
+        {% elif wt >= 28 and high_use %}24
+        {% elif wt >= 28 %}18
+        {% else %}6
+        {% endif %}
+      needs_boost: >-
+        {{ wt >= 30 and high_use }}
 
-      - conditions:
-          - condition: template
-            value_template: "{{ 10 <= states(temp_sensor) | float(20) < 20 }}"
-        sequence:
-          - action: number.set_value
-            target:
-              entity_id: !input chlorination_time_number
-            data:
-              value: 2
-          - action: switch.turn_on
-            target:
-              entity_id: !input filtration_pump_switch
-          - delay:
-              hours: 6
-          - action: switch.turn_off
-            target:
-              entity_id: !input filtration_pump_switch
+  # 1. Set chlorination (treatment) time on device
+  - action: number.set_value
+    target:
+      entity_id: !input chlorination_time_number
+    data:
+      value: "{{ treatment_hours }}"
 
-      - conditions:
-          - condition: template
-            value_template: "{{ 20 <= states(temp_sensor) | float(20) < 25 }}"
-        sequence:
-          - action: number.set_value
-            target:
-              entity_id: !input chlorination_time_number
-            data:
-              value: 4
-          - action: switch.turn_on
-            target:
-              entity_id: !input filtration_pump_switch
-          - delay:
-              hours: 10
-          - action: switch.turn_off
-            target:
-              entity_id: !input filtration_pump_switch
+  # 2. Activate or deactivate BOOST mode
+  - if:
+      - condition: template
+        value_template: "{{ needs_boost }}"
+    then:
+      - action: switch.turn_on
+        target:
+          entity_id: !input boost_switch
+    else:
+      - action: switch.turn_off
+        target:
+          entity_id: !input boost_switch
 
-      - conditions:
-          - condition: template
-            value_template: "{{ 25 <= states(temp_sensor) | float(20) < 28 }}"
-        sequence:
-          - action: number.set_value
-            target:
-              entity_id: !input chlorination_time_number
-            data:
-              value: 6
-          - action: switch.turn_on
-            target:
-              entity_id: !input filtration_pump_switch
-          - delay:
-              hours: 14
-          - action: switch.turn_off
-            target:
-              entity_id: !input filtration_pump_switch
-
-      - conditions:
-          - condition: template
-            value_template: "{{ 28 <= states(temp_sensor) | float(20) < 30 }}"
-        sequence:
-          - if:
-              - condition: template
-                value_template: "{{ attendance_entity != {} and is_state(attendance_entity, 'on') }}"
-            then:
-              # Forte fréquentation (uniquement si le switch est sélectionné ET actif)
-              - action: number.set_value
-                target:
-                  entity_id: !input chlorination_time_number
-                data:
-                  value: 12
-              - action: switch.turn_on
-                target:
-                  entity_id: !input filtration_pump_switch
-              - delay:
-                  hours: 24
-              - action: switch.turn_off
-                target:
-                  entity_id: !input filtration_pump_switch
-            else:
-              # Fréquentation normale (par défaut si non renseigné ou si le switch est OFF)
-              - action: number.set_value
-                target:
-                  entity_id: !input chlorination_time_number
-                data:
-                  value: 8
-              - action: switch.turn_on
-                target:
-                  entity_id: !input filtration_pump_switch
-              - delay:
-                  hours: 18
-              - action: switch.turn_off
-                target:
-                  entity_id: !input filtration_pump_switch
-
-      - conditions:
-          - condition: template
-            value_template: "{{ states(temp_sensor) | float(20) >= 30 }}"
-        sequence:
-          - if:
-              - condition: template
-                value_template: "{{ attendance_entity != {} and is_state(attendance_entity, 'on') }}"
-            then:
-              # Forte fréquentation (uniquement si le switch est sélectionné ET actif)
-              - action: switch.turn_on
-                target:
-                  entity_id: !input boost_switch
-              - action: switch.turn_on
-                target:
-                  entity_id: !input filtration_pump_switch
-              - delay:
-                  hours: 24
-              - action: switch.turn_off
-                target:
-                  entity_id: !input filtration_pump_switch
-            else:
-              # Fréquentation normale (par défaut si non renseigné ou si le switch est OFF)
-              - action: number.set_value
-                target:
-                  entity_id: !input chlorination_time_number
-                data:
-                  value: 12
-              - action: switch.turn_on
-                target:
-                  entity_id: !input filtration_pump_switch
-              - delay:
-                  hours: 24
-              - action: switch.turn_off
-                target:
-                  entity_id: !input filtration_pump_switch
+  # 3. Manage filtration pump: turn ON then schedule OFF
+  - if:
+      - condition: template
+        value_template: "{{ filtration_hours > 0 }}"
+    then:
+      - action: switch.turn_on
+        target:
+          entity_id: !input filtration_pump_switch
+      - delay:
+          hours: "{{ filtration_hours | int }}"
+      - action: switch.turn_off
+        target:
+          entity_id: !input filtration_pump_switch
+    else:
+      # Below 10°C: system inoperable, stop pump
+      - action: switch.turn_off
+        target:
+          entity_id: !input filtration_pump_switch
 
 mode: restart
 max_exceeded: silent
