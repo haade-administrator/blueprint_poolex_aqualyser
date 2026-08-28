@@ -10,85 +10,114 @@ Blueprint d'automatisation Home Assistant complet pour le **Poolex Aqualyser Mul
 
 ---
 
-## 📊 Préconisations du Fabricant / Manufacturer Recommendations
+## ❄️ Sécurité intempérie / Weather Safety
 
-### 🌡️ Température / Traitement / Filtration
+### 🇫🇷 Français
+Si la température de l'eau est **inférieure à 10°C**, l'Aqualyser et la pompe de filtration sont **éteints automatiquement**. L'électrolyseur ne peut pas fonctionner en dessous de 10°C (erreur E2).
+
+### 🇬🇧 English
+If water temperature drops **below 10°C**, the Aqualyser and filtration pump are **automatically shut down**. The electrolyser cannot operate below 10°C (error E2).
+
+---
+
+## 📊 Tableaux du Fabricant / Manufacturer Tables
+
+### 🌡️ Temps de Traitement (Chloration) / Treatment (Chlorination) Time
 
 #### 🇫🇷 Français
 
-| Température de l'eau | Temps de traitement | Temps de filtration |
+| Température de l'eau | Fréquentation normale | Forte fréquentation |
 | :--- | :--- | :--- |
-| **10°C ≤ T° < 20°C** *(ou piscine couverte)* | 2h | 6h |
-| **20°C ≤ T° < 25°C** | 4h | 10h |
-| **25°C ≤ T° < 28°C** | 6h | 14h |
-| **T° ≥ 28°C** *(Fréquentation normale)* | 8h | 18h |
-| **T° ≥ 28°C** *(Forte fréquentation)* | 12h | 24h |
-| **T° ≥ 30°C** *(Forte fréquentation)* | 24h *(BOOST)* | 24h |
+| **T° < 10°C** | Aqualyser ARRÊTÉ 🔴 | Aqualyser ARRÊTÉ 🔴 |
+| **10°C ≤ T° < 20°C** *(ou piscine couverte)* | 2h | 2h |
+| **20°C ≤ T° < 25°C** | 4h | 4h |
+| **25°C ≤ T° < 28°C** | 6h | 6h |
+| **28°C ≤ T° < 30°C** | 8h | 12h |
+| **T° ≥ 30°C** | 24h | 24h *(BOOST 100%)* |
 
 #### 🇬🇧 English
 
-| Water Temperature | Treatment Duration | Filtration Duration |
+| Water Temperature | Normal Attendance | High Attendance |
 | :--- | :--- | :--- |
-| **10°C ≤ T° < 20°C** *(or covered pool)* | 2h | 6h |
-| **20°C ≤ T° < 25°C** | 4h | 10h |
-| **25°C ≤ T° < 28°C** | 6h | 14h |
-| **T° ≥ 28°C** *(Normal attendance)* | 8h | 18h |
-| **T° ≥ 28°C** *(High attendance)* | 12h | 24h |
-| **T° ≥ 30°C** *(High attendance)* | 24h *(BOOST)* | 24h |
+| **T° < 10°C** | Aqualyser OFF 🔴 | Aqualyser OFF 🔴 |
+| **10°C ≤ T° < 20°C** *(or covered pool)* | 2h | 2h |
+| **20°C ≤ T° < 25°C** | 4h | 4h |
+| **25°C ≤ T° < 28°C** | 6h | 6h |
+| **28°C ≤ T° < 30°C** | 8h | 12h |
+| **T° ≥ 30°C** | 24h | 24h *(BOOST 100%)* |
+
+---
+
+### 💧 Temps de Filtration (Granulaire) / Filtration Time (Granular)
+
+#### 🇫🇷 Français
+
+| Température de l'eau | Temps de filtration | Forte fréquentation (28–30°C) |
+| :--- | :--- | :--- |
+| **T° < 10°C** | Pompe ARRÊTÉE 🔴 | Pompe ARRÊTÉE 🔴 |
+| **T° ≥ 10°C** | 5h | — |
+| **T° ≥ 12°C** | 6h | — |
+| **T° ≥ 14°C** | 7h | — |
+| **T° ≥ 16°C** | 8h | — |
+| **T° ≥ 18°C** | 9h | — |
+| **T° ≥ 20°C** | 10h | — |
+| **T° ≥ 22°C** | 11h | — |
+| **T° ≥ 23°C** | 12h | — |
+| **T° ≥ 25°C** | 12h | — |
+| **T° ≥ 26°C** | 14h | — |
+| **T° ≥ 27°C** | 15h | — |
+| **T° ≥ 28°C** | 16h | 24h |
+| **T° ≥ 29°C** | 20h | 24h |
+| **T° ≥ 30°C** | 24h | 24h |
+
+#### 🇬🇧 English
+
+| Water Temperature | Filtration Time | High Attendance (28–30°C) |
+| :--- | :--- | :--- |
+| **T° < 10°C** | Pump OFF 🔴 | Pump OFF 🔴 |
+| **T° ≥ 10°C** | 5h | — |
+| **T° ≥ 12°C** | 6h | — |
+| **T° ≥ 14°C** | 7h | — |
+| **T° ≥ 16°C** | 8h | — |
+| **T° ≥ 18°C** | 9h | — |
+| **T° ≥ 20°C** | 10h | — |
+| **T° ≥ 22°C** | 11h | — |
+| **T° ≥ 23°C** | 12h | — |
+| **T° ≥ 25°C** | 12h | — |
+| **T° ≥ 26°C** | 14h | — |
+| **T° ≥ 27°C** | 15h | — |
+| **T° ≥ 28°C** | 16h | 24h |
+| **T° ≥ 29°C** | 20h | 24h |
+| **T° ≥ 30°C** | 24h | 24h |
 
 ---
 
 ### 🏊 Volume du Bassin / Pool Volume → Taux de Production / Production Rate
 
-#### 🇫🇷 Français
+> Pour les tailles intermédiaires, la valeur supérieure est appliquée.
+> For intermediate sizes, the upper rate is applied.
 
-| Taille du bassin | Taux de production minimal |
+| Taille du bassin / Pool Size | Taux de production / Production rate |
 | :--- | :--- |
 | ≤ 15 m³ | 20% |
 | ≤ 30 m³ | 40% |
 | ≤ 50 m³ | 60% |
 | ≤ 60 m³ | 80% |
-| > 60 m³ | 100% |
-
-> Le volume du bassin est paramétrable dans le blueprint (slider 5-200 m³). Le taux de production est automatiquement calculé et appliqué à l'Aqualyser.
-
-#### 🇬🇧 English
-
-| Pool Size | Minimum Production Rate |
-| :--- | :--- |
-| ≤ 15 m³ | 20% |
-| ≤ 30 m³ | 40% |
-| ≤ 50 m³ | 60% |
-| ≤ 60 m³ | 80% |
-| > 60 m³ | 100% |
-
-> Pool volume is configurable in the blueprint (slider 5-200 m³). The production rate is automatically calculated and applied to the Aqualyser.
+| ≤ 80 m³ | 100% |
 
 ---
 
 ### 💧 Dureté de l'Eau / Water Hardness → Inversion de Polarité / Polarity Reversal
 
-#### 🇫🇷 Français
+> Pour les valeurs intermédiaires, le taux d'inversion supérieur (intervalle plus court) est appliqué.
+> For intermediate values, the upper reversal rate (shorter interval) is applied.
 
-| Titre Hydrotimétrique (TH) | Temps d'inversion de polarité |
+| Dureté / Hardness (TH) | Intervalle / Interval |
 | :--- | :--- |
 | TH < 30°f | 8h |
 | TH < 40°f | 6h |
 | TH < 50°f | 4h |
 | TH ≥ 50°f | 2h |
-
-> La dureté de l'eau est paramétrable dans le blueprint (slider 0-100 °f). L'intervalle d'inversion de polarité est automatiquement calculé et appliqué à l'Aqualyser.
-
-#### 🇬🇧 English
-
-| Water Hardness (TH) | Polarity Reversal Interval |
-| :--- | :--- |
-| TH < 30°f | 8h |
-| TH < 40°f | 6h |
-| TH < 50°f | 4h |
-| TH ≥ 50°f | 2h |
-
-> Water hardness is configurable in the blueprint (slider 0-100 °f). The polarity reversal interval is automatically calculated and applied to the Aqualyser.
 
 ---
 
@@ -96,36 +125,36 @@ Blueprint d'automatisation Home Assistant complet pour le **Poolex Aqualyser Mul
 
 ### 🇫🇷 Français
 L'option **Switch Fréquentation** est optionnelle :
-- **Non renseigné ou `OFF` (Par défaut)** : Fréquentation normale (ex: 8h chloration / 18h filtration à ≥28°C).
-- **`ON`** : Forte fréquentation (ex: 12h chloration / 24h filtration à ≥28°C, et Mode BOOST 24h à ≥30°C).
+- **Non renseigné ou `OFF` (Par défaut)** : Fréquentation normale.
+- **`ON`** : Forte fréquentation (durées de traitement et filtration supérieures, BOOST à ≥30°C).
 
 #### Comment créer l'entité dans Home Assistant :
 **Paramètres** → **Appareils et services** → **Entrées (Helpers)** → **Créer une entrée** → **Interrupteur (Input boolean)** → nommer `Forte Fréquentation Piscine`.
 
 ### 🇬🇧 English
 The **High Attendance Switch** is optional:
-- **Not set or `OFF` (Default)**: Normal attendance (e.g. 8h chlorination / 18h filtration at ≥28°C).
-- **`ON`**: High attendance (e.g. 12h chlorination / 24h filtration at ≥28°C, and 24h BOOST at ≥30°C).
+- **Not set or `OFF` (Default)**: Normal attendance.
+- **`ON`**: High attendance (higher treatment & filtration durations, BOOST at ≥30°C).
 
 #### How to create the entity in Home Assistant:
 **Settings** → **Devices & Services** → **Helpers** → **Create Helper** → **Toggle (Input boolean)** → name it `Pool High Attendance`.
 
 ---
 
-## 🔄 Fonctionnement des Déclencheurs / Trigger Logic
+## 🔄 Logique de Déclenchement / Trigger Logic
 
 ### 🇫🇷 Français
-Le blueprint combine **deux déclencheurs** :
-1. ⏰ **Heure quotidienne** : Lance le cycle de filtration chaque jour à l'heure configurée. Lit la température et calcule les durées.
-2. 🌡️ **Franchissement de seuil** : Si la température franchit un seuil (10, 20, 25, 28, 30°C) en cours de journée, le cycle est **recalculé et relancé** avec les nouvelles durées.
+Le blueprint utilise **deux types de déclencheurs** :
+1. ⏰ **Heure quotidienne** : Lance le cycle de filtration chaque jour à l'heure configurée.
+2. 🌡️ **Franchissement de seuil** : Si la température franchit un seuil (10, 12, 14, 16, 18, 20, 22, 23, 25, 26, 27, 28, 29, 30°C) en cours de journée, le cycle est **recalculé et relancé** automatiquement.
 
 ### 🇬🇧 English
-The blueprint combines **two triggers**:
-1. ⏰ **Daily schedule**: Starts the filtration cycle daily at the configured time. Reads temperature and calculates durations.
-2. 🌡️ **Threshold crossing**: If temperature crosses a threshold (10, 20, 25, 28, 30°C) during the day, the cycle is **recalculated and restarted** with new durations.
+The blueprint uses **two trigger types**:
+1. ⏰ **Daily schedule**: Starts the filtration cycle daily at the configured time.
+2. 🌡️ **Threshold crossing**: If temperature crosses a threshold (10, 12, 14, 16, 18, 20, 22, 23, 25, 26, 27, 28, 29, 30°C) during the day, the cycle **automatically recalculates and restarts**.
 
 ---
 
-## 🛠️ Fichiers inclus / Included Files
+## 🛠️ Fichiers / Files
 
 - `poolex_aqualyser_blueprint.yaml` : Blueprint d'automatisation Home Assistant.
