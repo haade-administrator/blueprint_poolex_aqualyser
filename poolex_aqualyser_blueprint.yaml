@@ -7,38 +7,55 @@ blueprint:
     ### 🇬🇧 English - Manufacturer Recommendations
 
 
-    **Temperature / Treatment / Filtration:**
+    **Treatment (Chlorination) time by temperature:**
 
-    - **10°C ≤ T° < 20°C (or covered pool):** Treatment = 2h | Filtration = 6h
+    - **T° < 10°C:** Aqualyser OFF (weather safety) | Pump OFF
 
-    - **20°C ≤ T° < 25°C:** Treatment = 4h | Filtration = 10h
+    - **10°C ≤ T° < 20°C:** Treatment = 2h
 
-    - **25°C ≤ T° < 28°C:** Treatment = 6h | Filtration = 14h
+    - **20°C ≤ T° < 25°C:** Treatment = 4h
 
-    - **T° ≥ 28°C (Normal):** Treatment = 8h | Filtration = 18h
+    - **25°C ≤ T° < 28°C:** Treatment = 6h
 
-    - **T° ≥ 28°C (High attendance):** Treatment = 12h | Filtration = 24h
+    - **28°C ≤ T° < 30°C (Normal):** Treatment = 8h
 
-    - **T° ≥ 30°C (High attendance):** Treatment = 24h BOOST | Filtration = 24h
+    - **28°C ≤ T° < 30°C (High attendance):** Treatment = 12h
+
+    - **T° ≥ 30°C:** Treatment = 24h
+
+    - **T° ≥ 30°C (High attendance):** BOOST mode (100% production / 24h)
 
 
-    **Pool volume / Min. production rate:**
+    **Filtration time by temperature (granular):**
 
-    - ≤15 m³ → 20% | ≤30 m³ → 40% | ≤50 m³ → 60% | ≤60 m³ → 80% | >60 m³ → 100%
+    - T° ≥ 10°C → 5h | ≥ 12°C → 6h | ≥ 14°C → 7h | ≥ 16°C → 8h | ≥ 18°C → 9h
+
+    - T° ≥ 20°C → 10h | ≥ 22°C → 11h | ≥ 23°C → 12h
+
+    - T° ≥ 25°C → 12h | ≥ 26°C → 14h | ≥ 27°C → 15h
+
+    - T° ≥ 28°C → 16h | ≥ 29°C → 20h (high attendance: 24h)
+
+    - T° ≥ 30°C → 24h
 
 
-    **Water hardness (TH) / Polarity reversal:**
+    **Pool volume → Production rate (upper value for intermediate sizes):**
+
+    - ≤15 m³ → 20% | ≤30 m³ → 40% | ≤50 m³ → 60% | ≤60 m³ → 80% | ≤80 m³ → 100%
+
+
+    **Water hardness (TH) → Polarity reversal (upper rate for intermediate values):**
 
     - TH < 30°f → 8h | TH < 40°f → 6h | TH < 50°f → 4h | TH ≥ 50°f → 2h
 
 
     ### ⚙️ High Attendance Switch (Optional)
 
-    - **Not set or OFF (Default):** Normal attendance.
+    - Not set or OFF (Default): Normal attendance mode.
 
-    - **ON:** High attendance mode.
+    - ON: High attendance mode (higher treatment & filtration durations).
 
-    - **Create in HA:** Settings → Helpers → Create → Toggle → "Pool High Attendance"
+    - Create in HA: Settings → Helpers → Create → Toggle → name it "Pool High Attendance"
 
 
     ---
@@ -47,42 +64,60 @@ blueprint:
     ### 🇫🇷 Français - Préconisations du Fabricant
 
 
-    **Température / Traitement / Filtration :**
+    **Temps de traitement (Chloration) par température :**
 
-    - **10°C ≤ T° < 20°C (ou piscine couverte) :** Traitement = 2h | Filtration = 6h
+    - **T° < 10°C :** Aqualyser ARRÊTÉ (sécurité intempérie) | Pompe ARRÊTÉE
 
-    - **20°C ≤ T° < 25°C :** Traitement = 4h | Filtration = 10h
+    - **10°C ≤ T° < 20°C :** Traitement = 2h
 
-    - **25°C ≤ T° < 28°C :** Traitement = 6h | Filtration = 14h
+    - **20°C ≤ T° < 25°C :** Traitement = 4h
 
-    - **T° ≥ 28°C (Normal) :** Traitement = 8h | Filtration = 18h
+    - **25°C ≤ T° < 28°C :** Traitement = 6h
 
-    - **T° ≥ 28°C (Forte fréquentation) :** Traitement = 12h | Filtration = 24h
+    - **28°C ≤ T° < 30°C (Fréquentation normale) :** Traitement = 8h
 
-    - **T° ≥ 30°C (Forte fréquentation) :** Traitement = 24h BOOST | Filtration = 24h
+    - **28°C ≤ T° < 30°C (Forte fréquentation) :** Traitement = 12h
+
+    - **T° ≥ 30°C :** Traitement = 24h
+
+    - **T° ≥ 30°C (Forte fréquentation) :** Mode BOOST (production 100% / 24h)
 
 
-    **Volume du bassin / Taux de production min. :**
+    **Temps de filtration par température (granulaire) :**
 
-    - ≤15 m³ → 20% | ≤30 m³ → 40% | ≤50 m³ → 60% | ≤60 m³ → 80% | >60 m³ → 100%
+    - T° ≥ 10°C → 5h | ≥ 12°C → 6h | ≥ 14°C → 7h | ≥ 16°C → 8h | ≥ 18°C → 9h
+
+    - T° ≥ 20°C → 10h | ≥ 22°C → 11h | ≥ 23°C → 12h
+
+    - T° ≥ 25°C → 12h | ≥ 26°C → 14h | ≥ 27°C → 15h
+
+    - T° ≥ 28°C → 16h | ≥ 29°C → 20h (forte fréquentation : 24h)
+
+    - T° ≥ 30°C → 24h
 
 
-    **Dureté de l'eau (TH) / Inversion de polarité :**
+    **Volume du bassin → Taux de production (valeur supérieure pour les tailles intermédiaires) :**
+
+    - ≤15 m³ → 20% | ≤30 m³ → 40% | ≤50 m³ → 60% | ≤60 m³ → 80% | ≤80 m³ → 100%
+
+
+    **Dureté de l'eau (TH) → Inversion de polarité (taux supérieur pour les valeurs intermédiaires) :**
 
     - TH < 30°f → 8h | TH < 40°f → 6h | TH < 50°f → 4h | TH ≥ 50°f → 2h
 
 
     ### ⚙️ Switch Fréquentation (Optionnel)
 
-    - **Non renseigné ou OFF (Par défaut) :** Fréquentation normale.
+    - Non renseigné ou OFF (Par défaut) : Fréquentation normale.
 
-    - **ON :** Mode forte fréquentation.
+    - ON : Forte fréquentation (durées de traitement et filtration supérieures).
 
-    - **Créer dans HA :** Paramètres → Entrées → Créer → Interrupteur → "Forte Fréquentation Piscine"
+    - Créer dans HA : Paramètres → Entrées → Créer → Interrupteur → "Forte Fréquentation Piscine"
 
   domain: automation
   source_url: https://github.com/haade-administrator/blueprint_poolex_aqualyser/blob/main/poolex_aqualyser_blueprint.yaml
   input:
+
     # ===== SENSORS / CAPTEURS =====
     water_temperature_sensor:
       name: "Water Temperature Sensor / Capteur Température Eau"
@@ -95,10 +130,19 @@ blueprint:
           device_class: temperature
 
     # ===== DEVICE ENTITIES / ENTITÉS APPAREIL =====
+    aqualyser_switch:
+      name: "Aqualyser Main Switch / Interrupteur Principal Aqualyser"
+      description: >
+        EN: Main ON/OFF switch of the Aqualyser. Automatically turned OFF when T° < 10°C (weather safety).
+        FR: Interrupteur principal ON/OFF de l'Aqualyser. Éteint automatiquement si T° < 10°C (sécurité intempérie).
+      selector:
+        entity:
+          domain: switch
+
     chlorination_time_number:
       name: "Chlorination Time / Temps de Chloration"
       description: >
-        EN: Chlorination duration in hours (dp 104, 1-24h).
+        EN: Chlorination duration entity in hours (dp 104, 1-24h).
         FR: Durée de chloration en heures (dp 104, 1-24h).
       selector:
         entity:
@@ -107,9 +151,9 @@ blueprint:
     output_level_number:
       name: "Output Level / Niveau de Production"
       description: >
-        EN: Production output level in % (dp 107, 20-100%).
+        EN: Production output level in % (dp 107, 0/20/40/60/80/100%).
         Auto-set based on pool volume.
-        FR: Niveau de production en % (dp 107, 20-100%).
+        FR: Niveau de production en % (dp 107, 0/20/40/60/80/100%).
         Réglé automatiquement selon le volume du bassin.
       selector:
         entity:
@@ -129,8 +173,8 @@ blueprint:
     boost_switch:
       name: "Boost Switch / Interrupteur Boost"
       description: >
-        EN: Boost mode switch (dp 106). 100% production for 24h.
-        FR: Interrupteur mode Boost (dp 106). Production 100% pendant 24h.
+        EN: Boost mode switch (dp 106). 100% production for 24h. Activated automatically at T° ≥ 30°C with high attendance.
+        FR: Interrupteur mode Boost (dp 106). Production 100% pendant 24h. Activé automatiquement à T° ≥ 30°C avec forte fréquentation.
       selector:
         entity:
           domain: switch
@@ -149,9 +193,11 @@ blueprint:
       name: "Pool Volume (m³) / Volume du Bassin (m³)"
       description: >
         EN: Pool volume in m³. Determines minimum production rate.
-        ≤15→20% | ≤30→40% | ≤50→60% | ≤60→80% | >60→100%
+        For intermediate sizes, upper rate is applied.
+        ≤15→20% | ≤30→40% | ≤50→60% | ≤60→80% | ≤80→100%
         FR: Volume du bassin en m³. Détermine le taux de production minimum.
-        ≤15→20% | ≤30→40% | ≤50→60% | ≤60→80% | >60→100%
+        Pour les tailles intermédiaires, la valeur supérieure est appliquée.
+        ≤15→20% | ≤30→40% | ≤50→60% | ≤60→80% | ≤80→100%
       default: 30
       selector:
         number:
@@ -164,9 +210,11 @@ blueprint:
     water_hardness:
       name: "Water Hardness TH (°f) / Dureté de l'Eau TH (°f)"
       description: >
-        EN: Water hardness in French degrees (°f). Determines polarity reversal.
+        EN: Water hardness in French degrees (°f). Determines polarity reversal interval.
+        For intermediate values, upper reversal rate (shorter interval) is applied.
         TH<30→8h | TH<40→6h | TH<50→4h | TH≥50→2h
-        FR: Dureté de l'eau en degrés français (°f). Détermine l'inversion de polarité.
+        FR: Dureté de l'eau en degrés français (°f). Détermine l'intervalle d'inversion de polarité.
+        Pour les valeurs intermédiaires, le taux d'inversion supérieur (intervalle plus court) est appliqué.
         TH<30→8h | TH<40→6h | TH<50→4h | TH≥50→2h
       default: 30
       selector:
@@ -181,10 +229,10 @@ blueprint:
     high_attendance_switch:
       name: "High Attendance Switch (Optional) / Switch Fréquentation (Optionnel)"
       description: >
-        EN: Optional input_boolean or switch. ON = High Attendance.
-        Not set or OFF = Normal (default).
-        FR: Optionnel. ON = Forte Fréquentation.
-        Non renseigné ou OFF = Normal (par défaut).
+        EN: Optional input_boolean or switch. ON = High Attendance (higher durations).
+        Not set or OFF = Normal attendance (default).
+        FR: Optionnel. ON = Forte Fréquentation (durées supérieures).
+        Non renseigné ou OFF = Fréquentation normale (par défaut).
       default: ""
       selector:
         entity:
@@ -196,10 +244,12 @@ blueprint:
     daily_start_time:
       name: "Daily Pump Start Time / Heure de Démarrage Quotidien"
       description: >
-        EN: Time to start the daily filtration cycle. The temperature
-        is read at this time and durations are calculated accordingly.
-        FR: Heure de lancement du cycle de filtration quotidien. La température
-        est lue à ce moment et les durées sont calculées en conséquence.
+        EN: Time each day to start the filtration cycle. Temperature is read
+        at this time and durations are calculated. The cycle also recalculates
+        automatically if temperature crosses a threshold during the day.
+        FR: Heure chaque jour pour lancer le cycle de filtration. La température
+        est lue à ce moment et les durées sont calculées. Le cycle se recalcule
+        aussi automatiquement si la température franchit un seuil en cours de journée.
       default: "09:00:00"
       selector:
         time: {}
@@ -209,71 +259,92 @@ variables:
   attendance_entity: !input high_attendance_switch
   vol: !input pool_volume
   th: !input water_hardness
-  high_use: >-
-    {{ attendance_entity | length > 0 and is_state(attendance_entity, 'on') }}
-  # Production rate based on pool volume
-  production_rate: >-
-    {% if vol | int(30) <= 15 %}20
-    {% elif vol | int(30) <= 30 %}40
-    {% elif vol | int(30) <= 50 %}60
-    {% elif vol | int(30) <= 60 %}80
-    {% else %}100
-    {% endif %}
-  # Polarity reversal interval based on water hardness
-  reversal_hours: >-
-    {% if th | int(30) < 30 %}8
-    {% elif th | int(30) < 40 %}6
-    {% elif th | int(30) < 50 %}4
-    {% else %}2
-    {% endif %}
 
 trigger:
-  # ===== Daily scheduled start =====
+  # Daily scheduled start
   - platform: time
     at: !input daily_start_time
     id: daily_start
 
-  # ===== Temperature threshold crossings =====
+  # Temperature threshold crossings (granular - each degree band)
+  # Below 10°C safety
   - platform: numeric_state
     entity_id: !input water_temperature_sensor
     below: 10
     id: temp_threshold
 
+  # 10–20°C band entry points
   - platform: numeric_state
     entity_id: !input water_temperature_sensor
     above: 10
-    below: 20
+    id: temp_threshold
+  - platform: numeric_state
+    entity_id: !input water_temperature_sensor
+    above: 12
+    id: temp_threshold
+  - platform: numeric_state
+    entity_id: !input water_temperature_sensor
+    above: 14
+    id: temp_threshold
+  - platform: numeric_state
+    entity_id: !input water_temperature_sensor
+    above: 16
+    id: temp_threshold
+  - platform: numeric_state
+    entity_id: !input water_temperature_sensor
+    above: 18
     id: temp_threshold
 
+  # 20–25°C band entry points
   - platform: numeric_state
     entity_id: !input water_temperature_sensor
     above: 20
-    below: 25
+    id: temp_threshold
+  - platform: numeric_state
+    entity_id: !input water_temperature_sensor
+    above: 22
+    id: temp_threshold
+  - platform: numeric_state
+    entity_id: !input water_temperature_sensor
+    above: 23
     id: temp_threshold
 
+  # 25–28°C band entry points
   - platform: numeric_state
     entity_id: !input water_temperature_sensor
     above: 25
-    below: 28
+    id: temp_threshold
+  - platform: numeric_state
+    entity_id: !input water_temperature_sensor
+    above: 26
+    id: temp_threshold
+  - platform: numeric_state
+    entity_id: !input water_temperature_sensor
+    above: 27
     id: temp_threshold
 
+  # 28–30°C band entry points
   - platform: numeric_state
     entity_id: !input water_temperature_sensor
     above: 28
-    below: 30
+    id: temp_threshold
+  - platform: numeric_state
+    entity_id: !input water_temperature_sensor
+    above: 29
     id: temp_threshold
 
+  # Above 30°C
   - platform: numeric_state
     entity_id: !input water_temperature_sensor
     above: 30
     id: temp_threshold
 
-  # ===== HA startup =====
+  # HA startup
   - platform: homeassistant
     event: start
     id: ha_start
 
-  # ===== Attendance switch change =====
+  # Attendance switch change → immediate recalculation
   - platform: state
     entity_id: !input high_attendance_switch
     id: attendance_changed
@@ -284,83 +355,149 @@ condition:
       {{ states(temp_sensor) not in ['unavailable', 'unknown', ''] }}
 
 action:
-  # Calculate durations based on current temperature
   - variables:
-      wt: "{{ states(temp_sensor) | float(20) }}"
-      treatment_hours: >-
-        {% if wt < 10 %}1
-        {% elif wt < 20 %}2
-        {% elif wt < 25 %}4
-        {% elif wt < 28 %}6
-        {% elif wt >= 30 and high_use %}24
-        {% elif wt >= 28 and high_use %}12
-        {% elif wt >= 28 %}8
+      w: "{{ states(temp_sensor) | float(20) }}"
+      hu: "{{ attendance_entity | default('', true) | string | length > 0 and is_state(attendance_entity, 'on') }}"
+
+      # Production rate from pool volume (upper value for intermediates)
+      production_rate: >-
+        {% set v = vol | int(30) %}
+        {% if v <= 15 %}20
+        {% elif v <= 30 %}40
+        {% elif v <= 50 %}60
+        {% elif v <= 60 %}80
+        {% else %}100
+        {% endif %}
+
+      # Polarity reversal interval from water hardness (upper rate = shorter interval for intermediates)
+      reversal_hours: >-
+        {% set t = th | int(30) %}
+        {% if t < 30 %}8
+        {% elif t < 40 %}6
+        {% elif t < 50 %}4
         {% else %}2
         {% endif %}
-      filtration_hours: >-
-        {% if wt < 10 %}0
-        {% elif wt < 20 %}6
-        {% elif wt < 25 %}10
-        {% elif wt < 28 %}14
-        {% elif wt >= 28 and high_use %}24
-        {% elif wt >= 28 %}18
-        {% else %}6
+
+      # Treatment (chlorination) hours
+      treatment_hours: >-
+        {% set w = states(temp_sensor) | float(20) %}
+        {% set hu = attendance_entity | default('', true) | string | length > 0 and is_state(attendance_entity, 'on') %}
+        {% if w < 10 %}0
+        {% elif w < 20 %}2
+        {% elif w < 25 %}4
+        {% elif w < 28 %}6
+        {% elif w < 30 and hu %}12
+        {% elif w < 30 %}8
+        {% else %}24
         {% endif %}
+
+      # Filtration hours (granular table)
+      filtration_hours: >-
+        {% set w = states(temp_sensor) | float(20) %}
+        {% set hu = attendance_entity | default('', true) | string | length > 0 and is_state(attendance_entity, 'on') %}
+        {% if w < 10 %}0
+        {% elif w >= 30 %}24
+        {% elif w >= 29 and hu %}24
+        {% elif w >= 29 %}20
+        {% elif w >= 28 and hu %}24
+        {% elif w >= 28 %}16
+        {% elif w >= 27 %}15
+        {% elif w >= 26 %}14
+        {% elif w >= 25 %}12
+        {% elif w >= 23 %}12
+        {% elif w >= 22 %}11
+        {% elif w >= 20 %}10
+        {% elif w >= 18 %}9
+        {% elif w >= 16 %}8
+        {% elif w >= 14 %}7
+        {% elif w >= 12 %}6
+        {% elif w >= 10 %}5
+        {% else %}0
+        {% endif %}
+
+      # Boost needed: T° >= 30°C AND high attendance
       needs_boost: >-
-        {{ wt >= 30 and high_use }}
+        {% set w = states(temp_sensor) | float(20) %}
+        {% set hu = attendance_entity | default('', true) | string | length > 0 and is_state(attendance_entity, 'on') %}
+        {{ w >= 30 and hu }}
 
-  # 1. Set chlorination (treatment) time
-  - action: number.set_value
-    target:
-      entity_id: !input chlorination_time_number
-    data:
-      value: "{{ treatment_hours }}"
+      # System should be shut down: T° < 10°C
+      shutdown_required: "{{ states(temp_sensor) | float(20) < 10 }}"
 
-  # 2. Set production output level (from pool volume)
-  - action: number.set_value
-    target:
-      entity_id: !input output_level_number
-    data:
-      value: "{{ production_rate }}"
-
-  # 3. Set polarity reversal interval (from water hardness)
-  - action: number.set_value
-    target:
-      entity_id: !input reverse_interval_number
-    data:
-      value: "{{ reversal_hours }}"
-
-  # 4. Manage BOOST mode
+  # ---- SAFETY: T° < 10°C → shut down everything ----
   - if:
       - condition: template
-        value_template: "{{ needs_boost }}"
+        value_template: "{{ shutdown_required }}"
     then:
-      - action: switch.turn_on
-        target:
-          entity_id: !input boost_switch
-    else:
       - action: switch.turn_off
         target:
           entity_id: !input boost_switch
+      - action: switch.turn_off
+        target:
+          entity_id: !input filtration_pump_switch
+      - action: switch.turn_off
+        target:
+          entity_id: !input aqualyser_switch
+    else:
 
-  # 5. Manage filtration pump: ON → delay → OFF
-  - if:
-      - condition: template
-        value_template: "{{ filtration_hours | int > 0 }}"
-    then:
+      # ---- NORMAL OPERATION ----
+
+      # 1. Ensure Aqualyser is ON
       - action: switch.turn_on
         target:
-          entity_id: !input filtration_pump_switch
-      - delay:
-          hours: "{{ filtration_hours | int }}"
-      - action: switch.turn_off
+          entity_id: !input aqualyser_switch
+
+      # 2. Set chlorination (treatment) time
+      - action: number.set_value
         target:
-          entity_id: !input filtration_pump_switch
-    else:
-      # Below 10°C: system inoperable, stop pump
-      - action: switch.turn_off
+          entity_id: !input chlorination_time_number
+        data:
+          value: "{{ treatment_hours | int }}"
+
+      # 3. Set production output level (from pool volume)
+      - action: number.set_value
         target:
-          entity_id: !input filtration_pump_switch
+          entity_id: !input output_level_number
+        data:
+          value: "{{ production_rate | int }}"
+
+      # 4. Set polarity reversal interval (from water hardness)
+      - action: number.set_value
+        target:
+          entity_id: !input reverse_interval_number
+        data:
+          value: "{{ reversal_hours | int }}"
+
+      # 5. Manage BOOST mode
+      - if:
+          - condition: template
+            value_template: "{{ needs_boost | bool }}"
+        then:
+          - action: switch.turn_on
+            target:
+              entity_id: !input boost_switch
+        else:
+          - action: switch.turn_off
+            target:
+              entity_id: !input boost_switch
+
+      # 6. Manage filtration pump: ON → wait filtration_hours → OFF
+      - if:
+          - condition: template
+            value_template: "{{ filtration_hours | int > 0 }}"
+        then:
+          - action: switch.turn_on
+            target:
+              entity_id: !input filtration_pump_switch
+          - delay:
+              hours: "{{ filtration_hours | int }}"
+          - action: switch.turn_off
+            target:
+              entity_id: !input filtration_pump_switch
+        else:
+          - action: switch.turn_off
+            target:
+              entity_id: !input filtration_pump_switch
 
 mode: restart
 max_exceeded: silent
