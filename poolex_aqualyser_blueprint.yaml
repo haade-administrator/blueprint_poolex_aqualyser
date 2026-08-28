@@ -1,10 +1,13 @@
 blueprint:
   name: "Poolex Aqualyser - Filtration & Chlorination Management"
   description: >
-    ## 🏊 Poolex Aqualyser - Smart Filtration & Chlorination / Gestion Smart Filtration & Chloration
+    ## 🏊 Poolex Aqualyser - Complete Pool Management
 
 
     ### 🇬🇧 English - Manufacturer Recommendations
+
+
+    **Temperature / Treatment / Filtration:**
 
     - **10°C ≤ T° < 20°C (or covered pool):** Treatment = 2h | Filtration = 6h
 
@@ -12,23 +15,30 @@ blueprint:
 
     - **25°C ≤ T° < 28°C:** Treatment = 6h | Filtration = 14h
 
-    - **T° ≥ 28°C (Normal attendance / default):** Treatment = 8h | Filtration = 18h
+    - **T° ≥ 28°C (Normal):** Treatment = 8h | Filtration = 18h
 
     - **T° ≥ 28°C (High attendance):** Treatment = 12h | Filtration = 24h
 
-    - **T° ≥ 30°C (High attendance):** Treatment = 24h (BOOST) | Filtration = 24h
+    - **T° ≥ 30°C (High attendance):** Treatment = 24h BOOST | Filtration = 24h
+
+
+    **Pool volume / Min. production rate:**
+
+    - ≤15 m³ → 20% | ≤30 m³ → 40% | ≤50 m³ → 60% | ≤60 m³ → 80% | >60 m³ → 100%
+
+
+    **Water hardness (TH) / Polarity reversal:**
+
+    - TH < 30°f → 8h | TH < 40°f → 6h | TH < 50°f → 4h | TH ≥ 50°f → 2h
 
 
     ### ⚙️ High Attendance Switch (Optional)
 
-    The **High Attendance Switch** option is optional:
+    - **Not set or OFF (Default):** Normal attendance.
 
-    - **Not set or set to `OFF` (Default):** Automation applies normal attendance.
+    - **ON:** High attendance mode.
 
-    - **Set to `ON`:** Automation switches to high attendance mode.
-
-
-    **How to create the entity in Home Assistant:** Settings → Devices & Services → Helpers → Create Helper → Toggle (Input boolean) and name it e.g. "Pool High Attendance".
+    - **Create in HA:** Settings → Helpers → Create → Toggle → "Pool High Attendance"
 
 
     ---
@@ -36,50 +46,82 @@ blueprint:
 
     ### 🇫🇷 Français - Préconisations du Fabricant
 
+
+    **Température / Traitement / Filtration :**
+
     - **10°C ≤ T° < 20°C (ou piscine couverte) :** Traitement = 2h | Filtration = 6h
 
     - **20°C ≤ T° < 25°C :** Traitement = 4h | Filtration = 10h
 
     - **25°C ≤ T° < 28°C :** Traitement = 6h | Filtration = 14h
 
-    - **T° ≥ 28°C (Fréquentation normale / par défaut) :** Traitement = 8h | Filtration = 18h
+    - **T° ≥ 28°C (Normal) :** Traitement = 8h | Filtration = 18h
 
     - **T° ≥ 28°C (Forte fréquentation) :** Traitement = 12h | Filtration = 24h
 
-    - **T° ≥ 30°C (Forte fréquentation) :** Traitement = 24h (BOOST) | Filtration = 24h
+    - **T° ≥ 30°C (Forte fréquentation) :** Traitement = 24h BOOST | Filtration = 24h
 
 
-    ### ⚙️ Fonctionnement du Switch Fréquentation (Optionnel)
+    **Volume du bassin / Taux de production min. :**
 
-    L'option **Switch Fréquentation** est optionnelle :
-
-    - **Non renseigné ou `OFF` (Par défaut) :** Fréquentation normale.
-
-    - **`ON` :** Mode forte fréquentation.
+    - ≤15 m³ → 20% | ≤30 m³ → 40% | ≤50 m³ → 60% | ≤60 m³ → 80% | >60 m³ → 100%
 
 
-    **Comment créer l'entité :** Paramètres → Appareils et services → Entrées (Helpers) → Créer une entrée → Interrupteur (Input boolean) et nommez-le "Forte Fréquentation Piscine".
+    **Dureté de l'eau (TH) / Inversion de polarité :**
+
+    - TH < 30°f → 8h | TH < 40°f → 6h | TH < 50°f → 4h | TH ≥ 50°f → 2h
+
+
+    ### ⚙️ Switch Fréquentation (Optionnel)
+
+    - **Non renseigné ou OFF (Par défaut) :** Fréquentation normale.
+
+    - **ON :** Mode forte fréquentation.
+
+    - **Créer dans HA :** Paramètres → Entrées → Créer → Interrupteur → "Forte Fréquentation Piscine"
 
   domain: automation
   source_url: https://github.com/haade-administrator/blueprint_poolex_aqualyser/blob/main/poolex_aqualyser_blueprint.yaml
   input:
+    # ===== SENSORS / CAPTEURS =====
     water_temperature_sensor:
       name: "Water Temperature Sensor / Capteur Température Eau"
       description: >
-        EN: Water temperature sensor entity. The automation triggers when
-        the temperature crosses a threshold boundary (10, 20, 25, 28, 30°C).
-        FR: Capteur de température de l'eau. L'automatisation se déclenche
-        quand la température franchit un seuil (10, 20, 25, 28, 30°C).
+        EN: Water temperature sensor (dp 111). Triggers on threshold crossing.
+        FR: Capteur température eau (dp 111). Déclenche au franchissement de seuil.
       selector:
         entity:
           domain: sensor
           device_class: temperature
 
+    # ===== DEVICE ENTITIES / ENTITÉS APPAREIL =====
     chlorination_time_number:
-      name: "Chlorination Time Number / Temps de Chloration"
+      name: "Chlorination Time / Temps de Chloration"
       description: >
-        EN: Number entity to set chlorination duration in hours (dp 104).
-        FR: Entité nombre pour définir le temps de chloration en heures (dp 104).
+        EN: Chlorination duration in hours (dp 104, 1-24h).
+        FR: Durée de chloration en heures (dp 104, 1-24h).
+      selector:
+        entity:
+          domain: number
+
+    output_level_number:
+      name: "Output Level / Niveau de Production"
+      description: >
+        EN: Production output level in % (dp 107, 20-100%).
+        Auto-set based on pool volume.
+        FR: Niveau de production en % (dp 107, 20-100%).
+        Réglé automatiquement selon le volume du bassin.
+      selector:
+        entity:
+          domain: number
+
+    reverse_interval_number:
+      name: "Polarity Reversal Interval / Intervalle Inversion Polarité"
+      description: >
+        EN: Polarity reversal interval in hours (dp 105, 2/4/6/8h).
+        Auto-set based on water hardness.
+        FR: Intervalle inversion de polarité en heures (dp 105, 2/4/6/8h).
+        Réglé automatiquement selon la dureté de l'eau.
       selector:
         entity:
           domain: number
@@ -87,8 +129,8 @@ blueprint:
     boost_switch:
       name: "Boost Switch / Interrupteur Boost"
       description: >
-        EN: Switch entity to activate 24h Boost mode (dp 106).
-        FR: Interrupteur pour activer le mode Boost 24h (dp 106).
+        EN: Boost mode switch (dp 106). 100% production for 24h.
+        FR: Interrupteur mode Boost (dp 106). Production 100% pendant 24h.
       selector:
         entity:
           domain: switch
@@ -96,19 +138,53 @@ blueprint:
     filtration_pump_switch:
       name: "Filtration Pump Switch / Switch Pompe de Filtration"
       description: >
-        EN: Switch entity controlling the filtration pump (external or dry contact).
+        EN: Switch controlling the filtration pump (external or dry contact).
         FR: Interrupteur contrôlant la pompe de filtration (externe ou contact sec).
       selector:
         entity:
           domain: switch
 
+    # ===== POOL SETTINGS / RÉGLAGES PISCINE =====
+    pool_volume:
+      name: "Pool Volume (m³) / Volume du Bassin (m³)"
+      description: >
+        EN: Pool volume in m³. Determines minimum production rate.
+        ≤15→20% | ≤30→40% | ≤50→60% | ≤60→80% | >60→100%
+        FR: Volume du bassin en m³. Détermine le taux de production minimum.
+        ≤15→20% | ≤30→40% | ≤50→60% | ≤60→80% | >60→100%
+      default: 30
+      selector:
+        number:
+          min: 5
+          max: 200
+          step: 1
+          unit_of_measurement: m³
+          mode: slider
+
+    water_hardness:
+      name: "Water Hardness TH (°f) / Dureté de l'Eau TH (°f)"
+      description: >
+        EN: Water hardness in French degrees (°f). Determines polarity reversal.
+        TH<30→8h | TH<40→6h | TH<50→4h | TH≥50→2h
+        FR: Dureté de l'eau en degrés français (°f). Détermine l'inversion de polarité.
+        TH<30→8h | TH<40→6h | TH<50→4h | TH≥50→2h
+      default: 30
+      selector:
+        number:
+          min: 0
+          max: 100
+          step: 1
+          unit_of_measurement: °f
+          mode: slider
+
+    # ===== OPTIONAL / OPTIONNEL =====
     high_attendance_switch:
       name: "High Attendance Switch (Optional) / Switch Fréquentation (Optionnel)"
       description: >
         EN: Optional input_boolean or switch. ON = High Attendance.
-        OFF or not set = Normal Attendance (default).
+        Not set or OFF = Normal (default).
         FR: Optionnel. ON = Forte Fréquentation.
-        OFF ou non renseigné = Fréquentation Normale (par défaut).
+        Non renseigné ou OFF = Normal (par défaut).
       default: ""
       selector:
         entity:
@@ -116,65 +192,99 @@ blueprint:
             - input_boolean
             - switch
 
+    # ===== SCHEDULE / PLANIFICATION =====
+    daily_start_time:
+      name: "Daily Pump Start Time / Heure de Démarrage Quotidien"
+      description: >
+        EN: Time to start the daily filtration cycle. The temperature
+        is read at this time and durations are calculated accordingly.
+        FR: Heure de lancement du cycle de filtration quotidien. La température
+        est lue à ce moment et les durées sont calculées en conséquence.
+      default: "09:00:00"
+      selector:
+        time: {}
+
 variables:
   temp_sensor: !input water_temperature_sensor
   attendance_entity: !input high_attendance_switch
+  vol: !input pool_volume
+  th: !input water_hardness
   high_use: >-
     {{ attendance_entity | length > 0 and is_state(attendance_entity, 'on') }}
+  # Production rate based on pool volume
+  production_rate: >-
+    {% if vol | int(30) <= 15 %}20
+    {% elif vol | int(30) <= 30 %}40
+    {% elif vol | int(30) <= 50 %}60
+    {% elif vol | int(30) <= 60 %}80
+    {% else %}100
+    {% endif %}
+  # Polarity reversal interval based on water hardness
+  reversal_hours: >-
+    {% if th | int(30) < 30 %}8
+    {% elif th | int(30) < 40 %}6
+    {% elif th | int(30) < 50 %}4
+    {% else %}2
+    {% endif %}
 
 trigger:
-  # Fires when temperature crosses INTO each range
+  # ===== Daily scheduled start =====
+  - platform: time
+    at: !input daily_start_time
+    id: daily_start
+
+  # ===== Temperature threshold crossings =====
   - platform: numeric_state
     entity_id: !input water_temperature_sensor
     below: 10
-    id: below_10
+    id: temp_threshold
 
   - platform: numeric_state
     entity_id: !input water_temperature_sensor
     above: 10
     below: 20
-    id: range_10_20
+    id: temp_threshold
 
   - platform: numeric_state
     entity_id: !input water_temperature_sensor
     above: 20
     below: 25
-    id: range_20_25
+    id: temp_threshold
 
   - platform: numeric_state
     entity_id: !input water_temperature_sensor
     above: 25
     below: 28
-    id: range_25_28
+    id: temp_threshold
 
   - platform: numeric_state
     entity_id: !input water_temperature_sensor
     above: 28
     below: 30
-    id: range_28_30
+    id: temp_threshold
 
   - platform: numeric_state
     entity_id: !input water_temperature_sensor
     above: 30
-    id: above_30
+    id: temp_threshold
 
-  # Also evaluate on HA startup
+  # ===== HA startup =====
   - platform: homeassistant
     event: start
     id: ha_start
 
-  # Re-evaluate when attendance switch changes
+  # ===== Attendance switch change =====
   - platform: state
     entity_id: !input high_attendance_switch
     id: attendance_changed
 
 condition:
-  # Ignore unavailable/unknown temperature states
   - condition: template
     value_template: >-
       {{ states(temp_sensor) not in ['unavailable', 'unknown', ''] }}
 
 action:
+  # Calculate durations based on current temperature
   - variables:
       wt: "{{ states(temp_sensor) | float(20) }}"
       treatment_hours: >-
@@ -199,14 +309,28 @@ action:
       needs_boost: >-
         {{ wt >= 30 and high_use }}
 
-  # 1. Set chlorination (treatment) time on device
+  # 1. Set chlorination (treatment) time
   - action: number.set_value
     target:
       entity_id: !input chlorination_time_number
     data:
       value: "{{ treatment_hours }}"
 
-  # 2. Activate or deactivate BOOST mode
+  # 2. Set production output level (from pool volume)
+  - action: number.set_value
+    target:
+      entity_id: !input output_level_number
+    data:
+      value: "{{ production_rate }}"
+
+  # 3. Set polarity reversal interval (from water hardness)
+  - action: number.set_value
+    target:
+      entity_id: !input reverse_interval_number
+    data:
+      value: "{{ reversal_hours }}"
+
+  # 4. Manage BOOST mode
   - if:
       - condition: template
         value_template: "{{ needs_boost }}"
@@ -219,10 +343,10 @@ action:
         target:
           entity_id: !input boost_switch
 
-  # 3. Manage filtration pump: turn ON then schedule OFF
+  # 5. Manage filtration pump: ON → delay → OFF
   - if:
       - condition: template
-        value_template: "{{ filtration_hours > 0 }}"
+        value_template: "{{ filtration_hours | int > 0 }}"
     then:
       - action: switch.turn_on
         target:
