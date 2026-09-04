@@ -235,13 +235,16 @@ entities:
             value: Flow
 
   # Current status (dp 120, read-only)
+  # Note: device only reports this dp when actively chlorinating,
+  # reversing polarity, suspended, or in boost mode.
   - entity: sensor
-    translation_key: status
+    name: Status
     class: enum
     dps:
       - id: 120
         type: string
         name: sensor
+        optional: true
         mapping:
           - dps_val: Chlorination
             value: Chlorination
