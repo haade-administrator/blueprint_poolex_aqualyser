@@ -4,25 +4,7 @@ blueprint:
     ## 🏊 Poolex Aqualyser - Complete Pool Management
 
 
-    Automates chlorination and filtration based on **manufacturer recommendations**.
-
-    Adjusts all parameters automatically based on water temperature, pool volume,
-    and water hardness.
-
-
-    ### 🇬🇧 English
-
-
-    **Features:**
-
-    - ❄️ **Weather safety:** Aqualyser + pump OFF when T° < 10°C
-
-    - 🔄 **Auto-restart:** If the Aqualyser is turned off (manually, app, etc.),
-    it is automatically restarted when T° ≥ 10°C
-
-    - 🌡️ **Real-time adjustment:** Recalculates on every temperature threshold crossing
-
-    - ⚡ **BOOST mode:** Auto-activated at T° ≥ 30°C with high attendance
+    ### 🇬🇧 English - Manufacturer Recommendations
 
 
     **Treatment (Chlorination) time by temperature:**
@@ -67,20 +49,7 @@ blueprint:
     - TH < 30°f → 8h | TH < 40°f → 6h | TH < 50°f → 4h | TH ≥ 50°f → 2h
 
 
-    **Triggers:**
-
-    - ⏰ Daily scheduled start (configurable time)
-
-    - 🌡️ Temperature threshold crossing (15 thresholds from 10°C to 30°C)
-
-    - 🏠 Home Assistant startup
-
-    - 👥 Attendance switch change
-
-    - 🔌 Aqualyser turned off → auto-restart if T° ≥ 10°C
-
-
-    **High Attendance Switch (Optional):**
+    ### ⚙️ High Attendance Switch (Optional)
 
     - Not set or OFF (Default): Normal attendance mode.
 
@@ -92,19 +61,7 @@ blueprint:
     ---
 
 
-    ### 🇫🇷 Français
-
-
-    **Fonctionnalités :**
-
-    - ❄️ **Sécurité intempérie :** Aqualyser + pompe OFF si T° < 10°C
-
-    - 🔄 **Redémarrage auto :** Si l'Aqualyser est éteint (manuellement, app, etc.),
-    il est redémarré automatiquement si T° ≥ 10°C
-
-    - 🌡️ **Ajustement temps réel :** Recalcul à chaque franchissement de seuil de température
-
-    - ⚡ **Mode BOOST :** Activé automatiquement à T° ≥ 30°C avec forte fréquentation
+    ### 🇫🇷 Français - Préconisations du Fabricant
 
 
     **Temps de traitement (Chloration) par température :**
@@ -149,20 +106,7 @@ blueprint:
     - TH < 30°f → 8h | TH < 40°f → 6h | TH < 50°f → 4h | TH ≥ 50°f → 2h
 
 
-    **Déclencheurs :**
-
-    - ⏰ Démarrage quotidien programmé (heure configurable)
-
-    - 🌡️ Franchissement de seuil de température (15 seuils de 10°C à 30°C)
-
-    - 🏠 Démarrage de Home Assistant
-
-    - 👥 Changement du switch de fréquentation
-
-    - 🔌 Aqualyser éteint → redémarrage auto si T° ≥ 10°C
-
-
-    **Switch Fréquentation (Optionnel) :**
+    ### ⚙️ Switch Fréquentation (Optionnel)
 
     - Non renseigné ou OFF (Par défaut) : Fréquentation normale.
 
@@ -404,12 +348,6 @@ trigger:
   - platform: state
     entity_id: !input high_attendance_switch
     id: attendance_changed
-
-  # Aqualyser turned off unexpectedly → recalculate and restart
-  - platform: state
-    entity_id: !input aqualyser_switch
-    to: "off"
-    id: aqualyser_off
 
 condition:
   - condition: template
