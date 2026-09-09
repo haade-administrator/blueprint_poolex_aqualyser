@@ -10,6 +10,73 @@ Blueprint d'automatisation Home Assistant complet pour le **Poolex Aqualyser Mul
 
 ---
 
+## ⚙️ Prérequis — Créer les Helpers / Prerequisites — Create Helpers
+
+Avant d'utiliser le blueprint, deux helpers doivent être créés dans Home Assistant.
+Before using the blueprint, two helpers must be created in Home Assistant.
+
+---
+
+### ⏱️ Helper 1 — Timer de Filtration / Filtration Timer
+
+**Obligatoire / Required**
+
+Ce timer gère l'arrêt automatique de la pompe de filtration. Sa durée est calculée et envoyée automatiquement par le blueprint — **pas de durée par défaut à configurer**.
+
+This timer manages the automatic shutdown of the filtration pump. Its duration is calculated and sent automatically by the blueprint — **no default duration to set**.
+
+#### 🇫🇷 Créer le Timer Filtration
+
+1. Aller dans **Paramètres** → **Appareils et services** → **Entrées (Helpers)**
+2. Cliquer sur **+ Créer une entrée**
+3. Choisir **Minuteur (Timer)**
+4. Renseigner :
+   - **Nom :** `Timer Filtration`
+   - **Durée par défaut :** laisser vide ou `0`
+   - **Restaurer au redémarrage :** ✅ activé (recommandé)
+5. Cliquer sur **Créer**
+
+#### 🇬🇧 Create the Filtration Timer
+
+1. Go to **Settings** → **Devices & Services** → **Helpers**
+2. Click **+ Create Helper**
+3. Choose **Timer**
+4. Fill in:
+   - **Name:** `Filtration Timer`
+   - **Duration:** leave empty or `0`
+   - **Restore on restart:** ✅ enabled (recommended)
+5. Click **Create**
+
+---
+
+### 👥 Helper 2 — Forte Fréquentation / High Attendance *(Optionnel / Optional)*
+
+**Optionnel / Optional**
+
+Permet de basculer entre fréquentation normale et forte fréquentation. Impacte uniquement la tranche 28–30°C (chloration 8h→12h, filtration augmentée) et déclenche le mode Boost à ≥30°C.
+
+Allows switching between normal and high attendance mode. Only affects the 28–30°C range (chlorination 8h→12h, increased filtration) and triggers Boost mode at ≥30°C.
+
+#### 🇫🇷 Créer le Switch Forte Fréquentation
+
+1. Aller dans **Paramètres** → **Appareils et services** → **Entrées (Helpers)**
+2. Cliquer sur **+ Créer une entrée**
+3. Choisir **Interrupteur (Input boolean)**
+4. Renseigner :
+   - **Nom :** `Forte Fréquentation Piscine`
+5. Cliquer sur **Créer**
+
+#### 🇬🇧 Create the High Attendance Switch
+
+1. Go to **Settings** → **Devices & Services** → **Helpers**
+2. Click **+ Create Helper**
+3. Choose **Toggle (Input boolean)**
+4. Fill in:
+   - **Name:** `Pool High Attendance`
+5. Click **Create**
+
+---
+
 ## ❄️ Sécurité intempérie / Weather Safety
 
 ### 🇫🇷 Français
@@ -24,37 +91,22 @@ If water temperature drops **below 10°C**, the Aqualyser and filtration pump ar
 
 ### 🌡️ Temps de Traitement (Chloration) / Treatment (Chlorination) Time
 
-#### 🇫🇷 Français
-
-| Température de l'eau | Fréquentation normale | Forte fréquentation |
+| Température / Temperature | Fréquentation normale / Normal | Forte fréquentation / High |
 | :--- | :--- | :--- |
-| **T° < 10°C** | Aqualyser ARRÊTÉ 🔴 | Aqualyser ARRÊTÉ 🔴 |
-| **10°C ≤ T° < 20°C** *(ou piscine couverte)* | 2h | 2h |
+| **T° < 10°C** | Aqualyser ARRÊTÉ 🔴 | Aqualyser OFF 🔴 |
+| **10°C ≤ T° < 20°C** | 2h | 2h |
 | **20°C ≤ T° < 25°C** | 4h | 4h |
 | **25°C ≤ T° < 28°C** | 6h | 6h |
-| **28°C ≤ T° < 30°C** | 8h | 12h |
-| **T° ≥ 30°C** | 24h | 24h *(BOOST 100%)* |
-
-#### 🇬🇧 English
-
-| Water Temperature | Normal Attendance | High Attendance |
-| :--- | :--- | :--- |
-| **T° < 10°C** | Aqualyser OFF 🔴 | Aqualyser OFF 🔴 |
-| **10°C ≤ T° < 20°C** *(or covered pool)* | 2h | 2h |
-| **20°C ≤ T° < 25°C** | 4h | 4h |
-| **25°C ≤ T° < 28°C** | 6h | 6h |
-| **28°C ≤ T° < 30°C** | 8h | 12h |
-| **T° ≥ 30°C** | 24h | 24h *(BOOST 100%)* |
+| **28°C ≤ T° < 30°C** | 8h | **12h** |
+| **T° ≥ 30°C** | 24h | 24h + **BOOST** |
 
 ---
 
 ### 💧 Temps de Filtration (Granulaire) / Filtration Time (Granular)
 
-#### 🇫🇷 Français
-
-| Température de l'eau | Temps de filtration | Forte fréquentation (28–30°C) |
+| Température / Temperature | Filtration | Forte fréquentation / High (28–30°C) |
 | :--- | :--- | :--- |
-| **T° < 10°C** | Pompe ARRÊTÉE 🔴 | Pompe ARRÊTÉE 🔴 |
+| **T° < 10°C** | Pompe ARRÊTÉE 🔴 | — |
 | **T° ≥ 10°C** | 5h | — |
 | **T° ≥ 12°C** | 6h | — |
 | **T° ≥ 14°C** | 7h | — |
@@ -66,28 +118,8 @@ If water temperature drops **below 10°C**, the Aqualyser and filtration pump ar
 | **T° ≥ 25°C** | 12h | — |
 | **T° ≥ 26°C** | 14h | — |
 | **T° ≥ 27°C** | 15h | — |
-| **T° ≥ 28°C** | 16h | 24h |
-| **T° ≥ 29°C** | 20h | 24h |
-| **T° ≥ 30°C** | 24h | 24h |
-
-#### 🇬🇧 English
-
-| Water Temperature | Filtration Time | High Attendance (28–30°C) |
-| :--- | :--- | :--- |
-| **T° < 10°C** | Pump OFF 🔴 | Pump OFF 🔴 |
-| **T° ≥ 10°C** | 5h | — |
-| **T° ≥ 12°C** | 6h | — |
-| **T° ≥ 14°C** | 7h | — |
-| **T° ≥ 16°C** | 8h | — |
-| **T° ≥ 18°C** | 9h | — |
-| **T° ≥ 20°C** | 10h | — |
-| **T° ≥ 22°C** | 11h | — |
-| **T° ≥ 23°C** | 12h | — |
-| **T° ≥ 25°C** | 12h | — |
-| **T° ≥ 26°C** | 14h | — |
-| **T° ≥ 27°C** | 15h | — |
-| **T° ≥ 28°C** | 16h | 24h |
-| **T° ≥ 29°C** | 20h | 24h |
+| **T° ≥ 28°C** | 16h | **24h** |
+| **T° ≥ 29°C** | 20h | **24h** |
 | **T° ≥ 30°C** | 24h | 24h |
 
 ---
@@ -97,13 +129,13 @@ If water temperature drops **below 10°C**, the Aqualyser and filtration pump ar
 > Pour les tailles intermédiaires, la valeur supérieure est appliquée.
 > For intermediate sizes, the upper rate is applied.
 
-| Taille du bassin / Pool Size | Taux de production / Production rate |
+| Volume | Taux / Rate |
 | :--- | :--- |
 | ≤ 15 m³ | 20% |
 | ≤ 30 m³ | 40% |
 | ≤ 50 m³ | 60% |
 | ≤ 60 m³ | 80% |
-| ≤ 80 m³ | 100% |
+| > 60 m³ | 100% |
 
 ---
 
@@ -118,40 +150,6 @@ If water temperature drops **below 10°C**, the Aqualyser and filtration pump ar
 | TH < 40°f | 6h |
 | TH < 50°f | 4h |
 | TH ≥ 50°f | 2h |
-
----
-
-## ⚙️ Switch Fréquentation (Optionnel) / High Attendance Switch (Optional)
-
-### 🇫🇷 Français
-L'option **Switch Fréquentation** est optionnelle :
-- **Non renseigné ou `OFF` (Par défaut)** : Fréquentation normale.
-- **`ON`** : Forte fréquentation (durées de traitement et filtration supérieures, BOOST à ≥30°C).
-
-#### Comment créer l'entité dans Home Assistant :
-**Paramètres** → **Appareils et services** → **Entrées (Helpers)** → **Créer une entrée** → **Interrupteur (Input boolean)** → nommer `Forte Fréquentation Piscine`.
-
-### 🇬🇧 English
-The **High Attendance Switch** is optional:
-- **Not set or `OFF` (Default)**: Normal attendance.
-- **`ON`**: High attendance (higher treatment & filtration durations, BOOST at ≥30°C).
-
-#### How to create the entity in Home Assistant:
-**Settings** → **Devices & Services** → **Helpers** → **Create Helper** → **Toggle (Input boolean)** → name it `Pool High Attendance`.
-
----
-
-## 🔄 Logique de Déclenchement / Trigger Logic
-
-### 🇫🇷 Français
-Le blueprint utilise **deux types de déclencheurs** :
-1. ⏰ **Heure quotidienne** : Lance le cycle de filtration chaque jour à l'heure configurée.
-2. 🌡️ **Franchissement de seuil** : Si la température franchit un seuil (10, 12, 14, 16, 18, 20, 22, 23, 25, 26, 27, 28, 29, 30°C) en cours de journée, le cycle est **recalculé et relancé** automatiquement.
-
-### 🇬🇧 English
-The blueprint uses **two trigger types**:
-1. ⏰ **Daily schedule**: Starts the filtration cycle daily at the configured time.
-2. 🌡️ **Threshold crossing**: If temperature crosses a threshold (10, 12, 14, 16, 18, 20, 22, 23, 25, 26, 27, 28, 29, 30°C) during the day, the cycle **automatically recalculates and restarts**.
 
 ---
 
