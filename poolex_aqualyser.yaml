@@ -235,11 +235,12 @@ entities:
             value: Flow
 
   # Current status (dp 120, read-only)
-  # Note: device only reports this dp when actively chlorinating,
-  # reversing polarity, suspended, or in boost mode.
+  # dp 120 (status_show) is defined in the Tuya data model but is not
+  # currently reported by the device firmware. Disabled by default.
   - entity: sensor
     name: Status
     class: enum
+    hidden: true
     dps:
       - id: 120
         type: string
