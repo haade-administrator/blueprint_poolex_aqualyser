@@ -24,6 +24,9 @@ blueprint:
 
     - ⚡ **BOOST mode:** Auto-activated at T° ≥ 30°C with high attendance
 
+    - ⏱️ **Timer-based pump management:** Uses a HA timer helper for pump shutdown
+    scheduling. Survives HA restarts. Automation finishes instantly.
+
 
     **Treatment (Chlorination) time by temperature:**
 
@@ -77,7 +80,15 @@ blueprint:
 
     - 👥 Attendance switch change
 
-    - 🔌 Aqualyser turned off → auto-restart if T° ≥ 10°C
+    - 🔌 Aqualyser turned off → auto-restart if T° ≥ 10°C (5s debounce)
+
+    - ⏱️ Filtration timer finished → pump OFF
+
+
+    **Prerequisites:**
+
+    - Create a Timer helper in HA: Settings → Helpers → Create → Timer →
+    name it "Filtration Timer". No default duration needed.
 
 
     **High Attendance Switch (Optional):**
@@ -105,6 +116,9 @@ blueprint:
     - 🌡️ **Ajustement temps réel :** Recalcul à chaque franchissement de seuil de température
 
     - ⚡ **Mode BOOST :** Activé automatiquement à T° ≥ 30°C avec forte fréquentation
+
+    - ⏱️ **Gestion pompe par timer :** Utilise un helper timer HA pour planifier
+    l'arrêt de la pompe. Survit aux redémarrages HA. L'automation finit instantanément.
 
 
     **Temps de traitement (Chloration) par température :**
@@ -159,7 +173,15 @@ blueprint:
 
     - 👥 Changement du switch de fréquentation
 
-    - 🔌 Aqualyser éteint → redémarrage auto si T° ≥ 10°C
+    - 🔌 Aqualyser éteint → redémarrage auto si T° ≥ 10°C (anti-rebond 5s)
+
+    - ⏱️ Timer de filtration terminé → pompe OFF
+
+
+    **Prérequis :**
+
+    - Créer un helper Timer dans HA : Paramètres → Entrées → Créer → Minuteur →
+    nommer "Timer Filtration". Pas de durée par défaut nécessaire.
 
 
     **Switch Fréquentation (Optionnel) :**
@@ -190,7 +212,9 @@ blueprint:
       name: "Aqualyser Main Switch / Interrupteur Principal Aqualyser"
       description: >
         EN: Main ON/OFF switch of the Aqualyser. Automatically turned OFF when T° < 10°C (weather safety).
+        Auto-restarted if turned off when T° ≥ 10°C.
         FR: Interrupteur principal ON/OFF de l'Aqualyser. Éteint automatiquement si T° < 10°C (sécurité intempérie).
+        Redémarré automatiquement si éteint quand T° ≥ 10°C.
       selector:
         entity:
           domain: switch
@@ -243,6 +267,18 @@ blueprint:
       selector:
         entity:
           domain: switch
+
+    # ===== TIMER / MINUTEUR =====
+    filtration_timer:
+      name: "Filtration Timer / Minuteur de Filtration"
+      description: >
+        EN: A timer helper used to schedule pump shutdown. Survives HA restarts.
+        Create in Settings → Helpers → Create → Timer. No default duration needed.
+        FR: Un helper timer pour planifier l'arrêt de la pompe. Survit aux redémarrages HA.
+        Créer dans Paramètres → Entrées → Créer → Minuteur. Pas de durée par défaut nécessaire.
+      selector:
+        entity:
+          domain: timer
 
     # ===== POOL SETTINGS / RÉGLAGES PISCINE =====
     pool_volume:
@@ -400,166 +436,130 @@ trigger:
     event: start
     id: ha_start
 
-  # Attendance switch change → immediate recalculation
+  # Attendance switch change (ignore unavailable → state transitions at startup)
   - platform: state
     entity_id: !input high_attendance_switch
+    from:
+      - "on"
+      - "off"
     id: attendance_changed
 
-  # Aqualyser turned off unexpectedly → recalculate and restart
+  # Aqualyser turned off unexpectedly (5s debounce to ignore transient states)
   - platform: state
     entity_id: !input aqualyser_switch
     to: "off"
+    for: "00:00:05"
     id: aqualyser_off
 
+  # Filtration timer finished → turn off pump
+  - platform: state
+    entity_id: !input filtration_timer
+    from: "active"
+    to: "idle"
+    id: timer_finished
+
 condition:
-  - condition: template
-    value_template: >-
-      {{ states(temp_sensor) not in ['unavailable', 'unknown', ''] }}
+  # Allow timer_finished to bypass temperature availability check
+  - condition: or
+    conditions:
+      - condition: trigger
+        id: timer_finished
+      - condition: template
+        value_template: >-
+          {{ states(temp_sensor) not in ['unavailable', 'unknown', ''] }}
 
 action:
-  - variables:
-      w: "{{ states(temp_sensor) | float(20) }}"
-      hu: "{{ attendance_entity | default('', true) | string | length > 0 and is_state(attendance_entity, 'on') }}"
-
-      # Production rate from pool volume (upper value for intermediates)
-      production_rate: >-
-        {% set v = vol | int(30) %}
-        {% if v <= 15 %}20
-        {% elif v <= 30 %}40
-        {% elif v <= 50 %}60
-        {% elif v <= 60 %}80
-        {% else %}100
-        {% endif %}
-
-      # Polarity reversal interval from water hardness (upper rate = shorter interval for intermediates)
-      reversal_hours: >-
-        {% set t = th | int(30) %}
-        {% if t < 30 %}8
-        {% elif t < 40 %}6
-        {% elif t < 50 %}4
-        {% else %}2
-        {% endif %}
-
-      # Treatment (chlorination) hours
-      treatment_hours: >-
-        {% set w = states(temp_sensor) | float(20) %}
-        {% set hu = attendance_entity | default('', true) | string | length > 0 and is_state(attendance_entity, 'on') %}
-        {% if w < 10 %}0
-        {% elif w < 20 %}2
-        {% elif w < 25 %}4
-        {% elif w < 28 %}6
-        {% elif w < 30 and hu %}12
-        {% elif w < 30 %}8
-        {% else %}24
-        {% endif %}
-
-      # Filtration hours (granular table)
-      filtration_hours: >-
-        {% set w = states(temp_sensor) | float(20) %}
-        {% set hu = attendance_entity | default('', true) | string | length > 0 and is_state(attendance_entity, 'on') %}
-        {% if w < 10 %}0
-        {% elif w >= 30 %}24
-        {% elif w >= 29 and hu %}24
-        {% elif w >= 29 %}20
-        {% elif w >= 28 and hu %}24
-        {% elif w >= 28 %}16
-        {% elif w >= 27 %}15
-        {% elif w >= 26 %}14
-        {% elif w >= 25 %}12
-        {% elif w >= 23 %}12
-        {% elif w >= 22 %}11
-        {% elif w >= 20 %}10
-        {% elif w >= 18 %}9
-        {% elif w >= 16 %}8
-        {% elif w >= 14 %}7
-        {% elif w >= 12 %}6
-        {% elif w >= 10 %}5
-        {% else %}0
-        {% endif %}
-
-      # Boost needed: T° >= 30°C AND high attendance
-      needs_boost: >-
-        {% set w = states(temp_sensor) | float(20) %}
-        {% set hu = attendance_entity | default('', true) | string | length > 0 and is_state(attendance_entity, 'on') %}
-        {{ w >= 30 and hu }}
-
-      # System should be shut down: T° < 10°C
-      shutdown_required: "{{ states(temp_sensor) | float(20) < 10 }}"
-
-  # ---- SAFETY: T° < 10°C → shut down everything ----
+  # ---- TIMER FINISHED: just turn off pump ----
   - if:
-      - condition: template
-        value_template: "{{ shutdown_required }}"
+      - condition: trigger
+        id: timer_finished
     then:
       - action: switch.turn_off
         target:
-          entity_id: !input boost_switch
-      - action: switch.turn_off
-        target:
           entity_id: !input filtration_pump_switch
-      - action: switch.turn_off
-        target:
-          entity_id: !input aqualyser_switch
+
     else:
+      # ---- NORMAL FLOW: calculate and configure ----
+      - variables:
+          w: "{{ states(temp_sensor) | float(20) }}"
+          hu: "{{ attendance_entity | default('', true) | string | length > 0 and is_state(attendance_entity, 'on') }}"
 
-      # ---- NORMAL OPERATION ----
+          # Production rate from pool volume (upper value for intermediates)
+          production_rate: >-
+            {% set v = vol | int(30) %}
+            {% if v <= 15 %}20
+            {% elif v <= 30 %}40
+            {% elif v <= 50 %}60
+            {% elif v <= 60 %}80
+            {% else %}100
+            {% endif %}
 
-      # 1. Ensure Aqualyser is ON
-      - action: switch.turn_on
-        target:
-          entity_id: !input aqualyser_switch
+          # Polarity reversal interval from water hardness (upper rate = shorter interval for intermediates)
+          reversal_hours: >-
+            {% set t = th | int(30) %}
+            {% if t < 30 %}8
+            {% elif t < 40 %}6
+            {% elif t < 50 %}4
+            {% else %}2
+            {% endif %}
 
-      # 2. Set chlorination (treatment) time
-      - action: number.set_value
-        target:
-          entity_id: !input chlorination_time_number
-        data:
-          value: "{{ treatment_hours | int }}"
+          # Treatment (chlorination) hours
+          treatment_hours: >-
+            {% set w = states(temp_sensor) | float(20) %}
+            {% set hu = attendance_entity | default('', true) | string | length > 0 and is_state(attendance_entity, 'on') %}
+            {% if w < 10 %}0
+            {% elif w < 20 %}2
+            {% elif w < 25 %}4
+            {% elif w < 28 %}6
+            {% elif w < 30 and hu %}12
+            {% elif w < 30 %}8
+            {% else %}24
+            {% endif %}
 
-      # 3. Set production output level (from pool volume)
-      - action: number.set_value
-        target:
-          entity_id: !input output_level_number
-        data:
-          value: "{{ production_rate | int }}"
+          # Filtration hours (granular table)
+          filtration_hours: >-
+            {% set w = states(temp_sensor) | float(20) %}
+            {% set hu = attendance_entity | default('', true) | string | length > 0 and is_state(attendance_entity, 'on') %}
+            {% if w < 10 %}0
+            {% elif w >= 30 %}24
+            {% elif w >= 29 and hu %}24
+            {% elif w >= 29 %}20
+            {% elif w >= 28 and hu %}24
+            {% elif w >= 28 %}16
+            {% elif w >= 27 %}15
+            {% elif w >= 26 %}14
+            {% elif w >= 25 %}12
+            {% elif w >= 23 %}12
+            {% elif w >= 22 %}11
+            {% elif w >= 20 %}10
+            {% elif w >= 18 %}9
+            {% elif w >= 16 %}8
+            {% elif w >= 14 %}7
+            {% elif w >= 12 %}6
+            {% elif w >= 10 %}5
+            {% else %}0
+            {% endif %}
 
-      # 4. Set polarity reversal interval (from water hardness)
-      - action: number.set_value
-        target:
-          entity_id: !input reverse_interval_number
-        data:
-          value: "{{ reversal_hours | int }}"
+          # Boost needed: T° >= 30°C AND high attendance
+          needs_boost: >-
+            {% set w = states(temp_sensor) | float(20) %}
+            {% set hu = attendance_entity | default('', true) | string | length > 0 and is_state(attendance_entity, 'on') %}
+            {{ w >= 30 and hu }}
 
-      # 5. Manage BOOST mode
+          # System should be shut down: T° < 10°C
+          shutdown_required: "{{ states(temp_sensor) | float(20) < 10 }}"
+
+      # ---- SAFETY: T° < 10°C → shut down everything ----
       - if:
           - condition: template
-            value_template: "{{ needs_boost | bool }}"
+            value_template: "{{ shutdown_required }}"
         then:
-          - action: switch.turn_on
+          - action: timer.cancel
+            target:
+              entity_id: !input filtration_timer
+          - action: switch.turn_off
             target:
               entity_id: !input boost_switch
-        else:
-          - action: switch.turn_off
-            target:
-              entity_id: !input boost_switch
-
-      # 6. Manage filtration pump: ON → wait filtration_hours → OFF
-      - if:
-          - condition: template
-            value_template: "{{ filtration_hours | int > 0 }}"
-        then:
-          - action: switch.turn_on
-            target:
-              entity_id: !input filtration_pump_switch
-          - delay:
-              hours: "{{ filtration_hours | int }}"
           - action: switch.turn_off
             target:
               entity_id: !input filtration_pump_switch
-        else:
-          - action: switch.turn_off
-            target:
-              entity_id: !input filtration_pump_switch
-
-mode: restart
-max_exceeded: silent
